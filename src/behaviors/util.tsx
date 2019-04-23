@@ -48,7 +48,7 @@ export const combineEventHandlers = (
   }, {});
 };
 
-export const combine = (behaviorProps: BehaviorProps[]) => {
+export const combine = (behaviorProps: BehaviorProps[]): BehaviorProps =>
   behaviorProps.reduce<BehaviorProps>((finalProps, behaviorProp) => {
     return {
       ...finalProps,
@@ -58,4 +58,3 @@ export const combine = (behaviorProps: BehaviorProps[]) => {
       ...combineEventHandlers(finalProps, behaviorProp),
     };
   }, {});
-};
