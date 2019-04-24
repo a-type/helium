@@ -27,23 +27,29 @@ export const useButton = (
   /**
    * referencing https://www.w3.org/TR/wai-aria-practices/examples/button/button.html
    */
-  const onKeyDown = useCallback((event: KeyboardEvent) => {
-    // The action button is activated by space on the keyup event, but the
-    // default action for space is already triggered on keydown. It needs to be
-    // prevented to stop scrolling the page before activating the button.
-    if (event.keyCode === KeyCode.Space) {
-      event.preventDefault();
-    } else if (event.keyCode === KeyCode.Enter) {
-      event.preventDefault();
-      onPressed && onPressed(event);
-    }
-  }, []);
-  const onKeyUp = useCallback((event: KeyboardEvent) => {
-    if (event.keyCode === KeyCode.Space) {
-      event.preventDefault();
-      onPressed && onPressed(event);
-    }
-  }, []);
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      // The action button is activated by space on the keyup event, but the
+      // default action for space is already triggered on keydown. It needs to be
+      // prevented to stop scrolling the page before activating the button.
+      if (event.keyCode === KeyCode.Space) {
+        event.preventDefault();
+      } else if (event.keyCode === KeyCode.Enter) {
+        event.preventDefault();
+        onPressed && onPressed(event);
+      }
+    },
+    [onPressed],
+  );
+  const onKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.keyCode === KeyCode.Space) {
+        event.preventDefault();
+        onPressed && onPressed(event);
+      }
+    },
+    [onPressed],
+  );
 
   const baseButtonProps = {
     role: 'button',
@@ -75,8 +81,9 @@ export const useToggleButton = (
 
   const combinedOnPressed = useCallback(
     ev => {
-      setToggled(!toggled);
-      onToggled && onToggled(!toggled);
+      const isToggled = !toggled;
+      setToggled(isToggled);
+      onToggled && onToggled(isToggled);
       onPressed && onPressed(ev);
     },
     [onPressed, onToggled, setToggled, toggled],

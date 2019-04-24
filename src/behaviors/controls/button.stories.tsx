@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useButton, useToggleButton } from './button';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
@@ -11,6 +11,7 @@ const buttonCss = css({
   border: 0,
   borderRadius: '8px',
   color: 'white',
+  cursor: 'pointer',
 });
 
 const focusCss = css({
@@ -21,23 +22,33 @@ const focusCss = css({
 });
 
 const Button: FC<{}> = ({ children }) => {
-  const buttonProps = useButton({
-    onPressed: action('onPressed'),
-    name: 'testbutton',
-    children,
-  });
+  const buttonProps = useButton(
+    {
+      onPressed: action('onPressed'),
+      name: 'testbutton',
+      children,
+    },
+    {
+      css: [buttonCss, focusCss],
+    },
+  );
 
-  return <button css={[buttonCss, focusCss]} {...buttonProps} />;
+  return <button {...buttonProps} />;
 };
 
 const DivButton: FC<{}> = ({ children }) => {
-  const buttonProps = useButton({
-    onPressed: action('onPressed'),
-    name: 'testbutton',
-    children,
-  });
+  const buttonProps = useButton(
+    {
+      onPressed: action('onPressed'),
+      name: 'testbutton',
+      children,
+    },
+    {
+      css: [buttonCss, focusCss],
+    },
+  );
 
-  return <div css={[buttonCss, focusCss]} {...buttonProps} />;
+  return <div {...buttonProps} />;
 };
 
 storiesOf('useButton', module)
@@ -45,20 +56,25 @@ storiesOf('useButton', module)
   .add('div button', () => <DivButton>Hello div</DivButton>);
 
 const toggleCss = css({
-  '&[aria-pressed]': {
+  '&[aria-pressed=true]': {
     background: 'lightblue',
   },
 });
 
 const ToggleButton: FC<{}> = ({ children }) => {
-  const buttonProps = useToggleButton({
-    onPressed: action('onPressed'),
-    onToggled: action('onToggled'),
-    name: 'testtogglebutton',
-    children,
-  });
+  const buttonProps = useToggleButton(
+    {
+      onPressed: action('onPressed'),
+      onToggled: action('onToggled'),
+      name: 'testtogglebutton',
+      children,
+    },
+    {
+      css: [buttonCss, focusCss, toggleCss],
+    },
+  );
 
-  return <button css={[buttonCss, focusCss, toggleCss]} {...buttonProps} />;
+  return <button {...buttonProps} />;
 };
 
 storiesOf('useToggleButton', module).add('basic toggle button', () => (

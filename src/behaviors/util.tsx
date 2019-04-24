@@ -1,14 +1,14 @@
 import { BehaviorProps } from '../types';
-import { CSSObject } from '@emotion/css';
+import { SerializedStyles } from '@emotion/css';
 
 export const castCssArray = (
-  cssOrList: CSSObject | CSSObject[] | undefined,
-): CSSObject[] =>
+  cssOrList: SerializedStyles | SerializedStyles[] | undefined,
+): SerializedStyles[] =>
   cssOrList instanceof Array ? cssOrList : !!cssOrList ? [cssOrList] : [];
 
 export const combineCss = (
-  baseCss: CSSObject | CSSObject[] | undefined,
-  css: CSSObject | CSSObject[] | undefined,
+  baseCss: SerializedStyles | SerializedStyles[] | undefined,
+  css: SerializedStyles | SerializedStyles[] | undefined,
 ) => castCssArray(baseCss).concat(castCssArray(css));
 
 export const combineClassName = (

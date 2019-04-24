@@ -1,8 +1,8 @@
-import { CSSObject } from '@emotion/core';
+import { SerializedStyles } from '@emotion/core';
 
 export type BehaviorProps = {
   [propName: string]: any;
-  css?: CSSObject | CSSObject[];
+  css?: SerializedStyles | SerializedStyles[];
   className?: string;
 };
 
