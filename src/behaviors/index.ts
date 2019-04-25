@@ -1,3 +1,3 @@
 export * from './controls/button';
-export * from './focus';
+export * from './basic/focus';
 export * from './util';

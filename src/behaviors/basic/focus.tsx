@@ -3,9 +3,9 @@ import { createContext, FC, RefObject, useState, useCallback } from 'react';
 
 export type FocusContextValue = {
   groupName: string | null;
-  register(elementName: string, elementRef: RefObject<HTMLElement>): void;
-  unregister(elementName: string): void;
-  focus(elementName: string): void;
+  register(elementId: string, elementRef: RefObject<HTMLElement>): void;
+  unregister(elementId: string): void;
+  focus(elementId: string): void;
 };
 
 export const FocusContext = createContext<FocusContextValue>({
@@ -28,31 +28,31 @@ export const FocusProvider: FC<FocusProviderProps> = ({
   }>({});
 
   const register = useCallback(
-    (elementName: string, elementRef: RefObject<HTMLElement>) => {
+    (elementId: string, elementRef: RefObject<HTMLElement>) => {
       setElements({
         ...elements,
-        [elementName]: elementRef,
+        [elementId]: elementRef,
       });
     },
     [elements, setElements],
   );
 
   const unregister = useCallback(
-    (elementName: string) => {
-      delete elements[elementName];
+    (elementId: string) => {
+      delete elements[elementId];
       setElements(elements);
     },
     [elements, setElements],
   );
 
   const focus = useCallback(
-    (elementName: string) => {
-      const elementRef = elements[elementName];
+    (elementId: string) => {
+      const elementRef = elements[elementId];
       if (elementRef && elementRef.current) {
         elementRef.current.focus();
       } else {
         console.debug(
-          `Tried to focus element ${elementName}, but it was not found in focus group${
+          `Tried to focus element ${elementId}, but it was not found in focus group${
             groupName ? ` "${groupName}"` : ''
           }`,
         );
@@ -75,17 +75,17 @@ export const FocusProvider: FC<FocusProviderProps> = ({
 };
 
 export type UseFocusConfig = {
-  name: string;
+  id: string;
   tabbable?: boolean;
 };
 
-export const useFocus = ({ name, tabbable = true }: UseFocusConfig) => {
+export const useFocus = ({ id, tabbable = true }: UseFocusConfig) => {
   const focusContext = useContext(FocusContext);
   const elementRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    focusContext.register(name, elementRef);
-    return () => focusContext.unregister(name);
+    focusContext.register(id, elementRef);
+    return () => focusContext.unregister(id);
   }, [elementRef]);
 
   return {

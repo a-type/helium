@@ -1,8 +1,10 @@
-import { SerializedStyles } from '@emotion/core';
+import { InterpolationWithTheme } from '@emotion/core';
+
+export type Css = InterpolationWithTheme<any>;
 
 export type BehaviorProps = {
   [propName: string]: any;
-  css?: SerializedStyles | SerializedStyles[];
+  css?: Css;
   className?: string;
 };
 

@@ -1,14 +1,11 @@
-import { BehaviorProps } from '../types';
-import { SerializedStyles } from '@emotion/css';
+import { BehaviorProps, Css } from '../types';
 
-export const castCssArray = (
-  cssOrList: SerializedStyles | SerializedStyles[] | undefined,
-): SerializedStyles[] =>
+export const castCssArray = (cssOrList: Css | Css[] | undefined): Css[] =>
   cssOrList instanceof Array ? cssOrList : !!cssOrList ? [cssOrList] : [];
 
 export const combineCss = (
-  baseCss: SerializedStyles | SerializedStyles[] | undefined,
-  css: SerializedStyles | SerializedStyles[] | undefined,
+  baseCss: Css | Css[] | undefined,
+  css: Css | Css[] | undefined,
 ) => castCssArray(baseCss).concat(castCssArray(css));
 
 export const combineClassName = (
@@ -48,8 +45,14 @@ export const combineEventHandlers = (
   }, {});
 };
 
-export const combine = (behaviorProps: BehaviorProps[]): BehaviorProps =>
+type MaybeBehaviorProps = BehaviorProps | undefined;
+
+export const combine = (behaviorProps: MaybeBehaviorProps[]): BehaviorProps =>
   behaviorProps.reduce<BehaviorProps>((finalProps, behaviorProp) => {
+    if (!behaviorProp) {
+      return finalProps;
+    }
+
     return {
       ...finalProps,
       ...behaviorProp,

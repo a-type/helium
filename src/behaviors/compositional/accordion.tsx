@@ -27,8 +27,8 @@ export const useAccordion = ({
 
   const buttonProps = useButton(
     {
-      onPressed: toggleExpanded,
-      name: buttonId,
+      onPress: toggleExpanded,
+      id: buttonId,
       children: titleContent,
       label: titleLabel,
     },

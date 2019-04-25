@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useButton, useToggleButton } from './button';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
@@ -24,8 +24,8 @@ const focusCss = css({
 const Button: FC<{}> = ({ children }) => {
   const buttonProps = useButton(
     {
-      onPressed: action('onPressed'),
-      name: 'testbutton',
+      onPress: action('onPressed'),
+      id: 'testbutton',
       children,
     },
     {
@@ -39,8 +39,8 @@ const Button: FC<{}> = ({ children }) => {
 const DivButton: FC<{}> = ({ children }) => {
   const buttonProps = useButton(
     {
-      onPressed: action('onPressed'),
-      name: 'testbutton',
+      onPress: action('onPressed'),
+      id: 'testbutton',
       children,
     },
     {
@@ -62,11 +62,16 @@ const toggleCss = css({
 });
 
 const ToggleButton: FC<{}> = ({ children }) => {
+  const [toggled, setToggled] = useState(false);
   const buttonProps = useToggleButton(
     {
-      onPressed: action('onPressed'),
-      onToggled: action('onToggled'),
-      name: 'testtogglebutton',
+      toggled,
+      onPress: action('onPressed'),
+      onChange: toggleState => {
+        setToggled(toggleState);
+        action('onToggled')(toggleState);
+      },
+      id: 'testtogglebutton',
       children,
     },
     {
