@@ -4,9 +4,9 @@ import { useGrid, useBox, GridConfig, BoxConfig } from './container';
 import { storiesOf } from '@storybook/react';
 import { jsx } from '@emotion/core';
 
-const Grid: FC<GridConfig> = ({ children, ...rest }) => {
-  const gridProps = useGrid(rest, {
-    children,
+const Grid: FC<GridConfig> = props => {
+  const gridProps = useGrid({
+    ...props,
     css: {
       width: '100%',
       height: '300px',
@@ -31,9 +31,9 @@ storiesOf('useGrid', module).add('basic grid', () => (
   </Grid>
 ));
 
-const Box: FC<BoxConfig> = ({ children, ...rest }) => {
-  const boxProps = useBox(rest, {
-    children,
+const Box: FC<BoxConfig> = props => {
+  const boxProps = useBox({
+    ...props,
     css: {
       width: '100%',
       height: '300px',

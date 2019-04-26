@@ -1,16 +1,15 @@
 import { InterpolationWithTheme } from '@emotion/core';
 
-export type Css = InterpolationWithTheme<any>;
+export type ExtraProps = {
+  [propName: string]: any;
+};
 
 export type BehaviorProps = {
-  [propName: string]: any;
-  css?: Css;
+  css?: InterpolationWithTheme<any>;
   className?: string;
-};
+} & ExtraProps;
 
-export type Behavior = {
-  props: BehaviorProps;
-};
+export type Behavior = (configAndProps: any) => any;
 
 export enum KeyCode {
   Space = 32,

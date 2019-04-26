@@ -1,5 +1,7 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import { createContext, FC, RefObject, useState, useCallback } from 'react';
+import { ExtraProps } from '../../types';
+import { combine } from '../util';
 
 export type FocusContextValue = {
   groupName: string | null;
@@ -77,9 +79,9 @@ export const FocusProvider: FC<FocusProviderProps> = ({
 export type UseFocusConfig = {
   id: string;
   tabbable?: boolean;
-};
+} & ExtraProps;
 
-export const useFocus = ({ id, tabbable = true }: UseFocusConfig) => {
+export const useFocus = ({ id, tabbable = true, ...rest }: UseFocusConfig) => {
   const focusContext = useContext(FocusContext);
   const elementRef = useRef<HTMLElement>(null);
 
@@ -88,8 +90,11 @@ export const useFocus = ({ id, tabbable = true }: UseFocusConfig) => {
     return () => focusContext.unregister(id);
   }, [elementRef]);
 
-  return {
-    ref: elementRef,
-    tabIndex: tabbable ? 0 : -1,
-  };
+  return combine([
+    {
+      ref: elementRef,
+      tabIndex: tabbable ? 0 : -1,
+    },
+    rest,
+  ]);
 };

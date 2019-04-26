@@ -1,12 +1,17 @@
-import { BehaviorProps, Css } from '../types';
+import { BehaviorProps, Behavior, ExtraProps } from '../types';
+import { useMemo } from 'react';
+import { ArrayInterpolation } from '@emotion/css';
+import { InterpolationWithTheme } from '@emotion/core';
 
-export const castCssArray = (cssOrList: Css | Css[] | undefined): Css[] =>
+export const castCssArray = (
+  cssOrList: InterpolationWithTheme<any> | undefined,
+): ArrayInterpolation<any> =>
   cssOrList instanceof Array ? cssOrList : !!cssOrList ? [cssOrList] : [];
 
 export const combineCss = (
-  baseCss: Css | Css[] | undefined,
-  css: Css | Css[] | undefined,
-) => castCssArray(baseCss).concat(castCssArray(css));
+  baseCss: InterpolationWithTheme<any> | undefined,
+  css: InterpolationWithTheme<any> | undefined,
+): ArrayInterpolation<any> => castCssArray(baseCss).concat(castCssArray(css));
 
 export const combineClassName = (
   baseClassName: string | undefined,
@@ -61,3 +66,15 @@ export const combine = (behaviorProps: MaybeBehaviorProps[]): BehaviorProps =>
       ...combineEventHandlers(finalProps, behaviorProp),
     };
   }, {});
+
+export const useCompose = <Props extends ExtraProps>(
+  props: Props,
+  behaviorHooks: Behavior[],
+) => {
+  // memoize once. hooks must always be run in the same order.
+  const memoizedBehaviorHooks = useMemo(() => behaviorHooks, []);
+  return memoizedBehaviorHooks.reduce(
+    (currentProps, behavior) => behavior(currentProps),
+    props,
+  );
+};

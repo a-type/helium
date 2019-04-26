@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { KeyCode } from '../../types';
+import { KeyCode, ExtraProps } from '../../types';
 import { useFocus } from './focus';
 import { combine } from '../util';
 
@@ -7,12 +7,13 @@ export type PressableConfig = {
   id: string;
   tabbable?: boolean;
   onPress: () => void;
-};
+} & ExtraProps;
 
 export const usePressable = ({
   onPress: onPressed,
   id,
   tabbable = true,
+  ...rest
 }: PressableConfig) => {
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -49,5 +50,6 @@ export const usePressable = ({
       onClick,
     },
     focusProps,
+    rest,
   ]);
 };

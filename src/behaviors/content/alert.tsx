@@ -1,9 +1,14 @@
 import { HTMLAttributes } from 'react';
+import { ExtraProps } from '../../types';
+import { combine } from '../util';
 
-export type AlertConfig = {};
+export type AlertConfig = {} & ExtraProps;
 
-export const useAlert = ({}): HTMLAttributes<HTMLElement> => {
-  return {
-    role: 'alert',
-  };
+export const useAlert = ({ ...rest }): HTMLAttributes<HTMLElement> => {
+  return combine([
+    {
+      role: 'alert',
+    },
+    rest,
+  ]);
 };

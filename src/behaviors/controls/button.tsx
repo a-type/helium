@@ -1,20 +1,24 @@
 import { useCallback, KeyboardEvent, HTMLAttributes, ReactNode } from 'react';
-import { KeyCode, BehaviorProps } from '../../types';
+import { KeyCode, BehaviorProps, ExtraProps } from '../../types';
 import { combine } from '../util';
 import { PressableConfig, usePressable } from '../basic/interaction';
 
 export type ButtonConfig = PressableConfig & {
   children: ReactNode;
   label?: string;
-};
+} & ExtraProps;
 
 /**
  * Turns a component into a button.
  */
-export const useButton = (
-  { onPress: onPressed, id, label, children, tabbable }: ButtonConfig,
-  extraProps: BehaviorProps = {},
-): BehaviorProps => {
+export const useButton = ({
+  onPress: onPressed,
+  id,
+  label,
+  children,
+  tabbable,
+  ...rest
+}: ButtonConfig): BehaviorProps => {
   /**
    * referencing https://www.w3.org/TR/wai-aria-practices/examples/button/button.html
    */
@@ -43,7 +47,7 @@ export const useButton = (
     tabbable,
   });
 
-  return combine([baseButtonProps, pressableProps, extraProps]);
+  return combine([baseButtonProps, pressableProps, rest]);
 };
 
 export type ToggleButtonConfig = ButtonConfig & {
@@ -51,24 +55,21 @@ export type ToggleButtonConfig = ButtonConfig & {
   onChange: (toggleState: boolean) => void;
 };
 
-export const useToggleButton = (
-  { onPress: onPressed, onChange, toggled, ...rest }: ToggleButtonConfig,
-  extraProps: BehaviorProps = {},
-): BehaviorProps => {
+export const useToggleButton = ({
+  onPress: onPressed,
+  onChange,
+  toggled,
+  ...rest
+}: ToggleButtonConfig): BehaviorProps => {
   const combinedOnPressed = useCallback(() => {
     const isToggled = !toggled;
     onChange && onChange(isToggled);
     onPressed && onPressed();
   }, [onPressed, onChange, toggled]);
 
-  return useButton(
-    {
-      ...rest,
-      onPress: combinedOnPressed,
-    },
-    {
-      ...extraProps,
-      'aria-pressed': toggled,
-    },
-  );
+  return useButton({
+    ...rest,
+    onPress: combinedOnPressed,
+    'aria-pressed': toggled,
+  });
 };

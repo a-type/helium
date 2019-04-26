@@ -1,15 +1,16 @@
-import { BehaviorProps } from '../types';
+import { BehaviorProps, ExtraProps } from '../types';
 
 export type FlexLayoutConfig = {
   direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
   align?: 'start' | 'end' | 'center' | 'stretch' | 'space-between';
   justify?: 'start' | 'end' | 'center' | 'stretch' | 'space-between';
-};
+} & ExtraProps;
 
 export const useFlexLayout = ({
   direction = 'column',
   align = 'start',
   justify = 'start',
+  ...rest
 }: FlexLayoutConfig = {}): BehaviorProps => {
   return {
     css: {
@@ -18,6 +19,7 @@ export const useFlexLayout = ({
       alignItems: align,
       justifyContent: justify,
     },
+    ...rest,
   };
 };
 
@@ -26,7 +28,7 @@ export type GridLayoutConfig = {
   rows?: string[];
   columns?: string[];
   gap?: string | [string, string];
-};
+} & ExtraProps;
 
 const isTwoDimensionalArray = <T>(array: T[][] | T[]): array is T[][] =>
   array[0] instanceof Array;
@@ -36,6 +38,7 @@ export const useGridLayout = ({
   rows = [],
   columns = [],
   gap = '0',
+  ...rest
 }: GridLayoutConfig = {}): BehaviorProps => {
   const normalizedAreas: string[][] = isTwoDimensionalArray(areas)
     ? areas
@@ -54,6 +57,7 @@ export const useGridLayout = ({
       gridTemplateColumns: columns.join(' '),
       gap: gapString,
     },
+    ...rest,
   };
 };
 
@@ -71,7 +75,7 @@ export type Spacing =
 export type SpacingConfig = {
   margin?: Spacing;
   padding?: Spacing;
-};
+} & ExtraProps;
 
 const parseSpacing = (
   spacing: Spacing | undefined,
@@ -98,11 +102,13 @@ const parseSpacing = (
 export const useSpacing = ({
   margin,
   padding,
+  ...rest
 }: SpacingConfig = {}): BehaviorProps => {
   return {
     css: {
       ...parseSpacing(margin, 'margin'),
       ...parseSpacing(padding, 'padding'),
     },
+    ...rest,
   };
 };

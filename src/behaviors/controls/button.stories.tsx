@@ -22,31 +22,23 @@ const focusCss = css({
 });
 
 const Button: FC<{}> = ({ children }) => {
-  const buttonProps = useButton(
-    {
-      onPress: action('onPressed'),
-      id: 'testbutton',
-      children,
-    },
-    {
-      css: [buttonCss, focusCss],
-    },
-  );
+  const buttonProps = useButton({
+    onPress: action('onPressed'),
+    id: 'testbutton',
+    children,
+    css: [buttonCss, focusCss],
+  });
 
   return <button {...buttonProps} />;
 };
 
 const DivButton: FC<{}> = ({ children }) => {
-  const buttonProps = useButton(
-    {
-      onPress: action('onPressed'),
-      id: 'testbutton',
-      children,
-    },
-    {
-      css: [buttonCss, focusCss],
-    },
-  );
+  const buttonProps = useButton({
+    onPress: action('onPressed'),
+    id: 'testbutton',
+    children,
+    css: [buttonCss, focusCss],
+  });
 
   return <div {...buttonProps} />;
 };
@@ -63,21 +55,17 @@ const toggleCss = css({
 
 const ToggleButton: FC<{}> = ({ children }) => {
   const [toggled, setToggled] = useState(false);
-  const buttonProps = useToggleButton(
-    {
-      toggled,
-      onPress: action('onPressed'),
-      onChange: toggleState => {
-        setToggled(toggleState);
-        action('onToggled')(toggleState);
-      },
-      id: 'testtogglebutton',
-      children,
+  const buttonProps = useToggleButton({
+    toggled,
+    onPress: action('onPressed'),
+    onChange: toggleState => {
+      setToggled(toggleState);
+      action('onToggled')(toggleState);
     },
-    {
-      css: [buttonCss, focusCss, toggleCss],
-    },
-  );
+    id: 'testtogglebutton',
+    children,
+    css: [buttonCss, focusCss, toggleCss],
+  });
 
   return <button {...buttonProps} />;
 };
