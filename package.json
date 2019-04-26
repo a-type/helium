@@ -23,7 +23,9 @@
     "example": "wp --config example/webpack.config.js"
   },
   "dependencies": {
-    "@emotion/core": "^10.0.10"
+    "@emotion/core": "^10.0.10",
+    "@ramda/pathor": "^0.26.1",
+    "ramda.path": "^0.26.1"
   },
   "peerDependencies": {
     "react": "^16.8.0",
