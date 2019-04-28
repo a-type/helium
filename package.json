@@ -25,6 +25,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "@ramda/pathor": "^0.26.1",
+    "emotion-theming": "^10.0.10",
     "ramda.path": "^0.26.1"
   },
   "peerDependencies": {

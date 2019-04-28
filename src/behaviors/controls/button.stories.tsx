@@ -14,19 +14,12 @@ const buttonCss = css({
   cursor: 'pointer',
 });
 
-const focusCss = css({
-  '&:focus': {
-    outline: 0,
-    boxShadow: '0 0 0 3px #00000080',
-  },
-});
-
 const Button: FC<{}> = ({ children }) => {
   const buttonProps = useButton({
     onPress: action('onPressed'),
     id: 'testbutton',
     children,
-    css: [buttonCss, focusCss],
+    css: [buttonCss],
   });
 
   return <button {...buttonProps} />;
@@ -37,13 +30,13 @@ const DivButton: FC<{}> = ({ children }) => {
     onPress: action('onPressed'),
     id: 'testbutton',
     children,
-    css: [buttonCss, focusCss],
+    css: [buttonCss],
   });
 
   return <div {...buttonProps} />;
 };
 
-storiesOf('useButton', module)
+storiesOf('behaviors/useButton', module)
   .add('basic button', () => <Button>Hello world</Button>)
   .add('div button', () => <DivButton>Hello div</DivButton>);
 
@@ -64,12 +57,13 @@ const ToggleButton: FC<{}> = ({ children }) => {
     },
     id: 'testtogglebutton',
     children,
-    css: [buttonCss, focusCss, toggleCss],
+    css: [buttonCss, toggleCss],
   });
 
   return <button {...buttonProps} />;
 };
 
-storiesOf('useToggleButton', module).add('basic toggle button', () => (
-  <ToggleButton>Hello toggle</ToggleButton>
-));
+storiesOf('behaviors/useToggleButton', module).add(
+  'basic toggle button',
+  () => <ToggleButton>Hello toggle</ToggleButton>,
+);

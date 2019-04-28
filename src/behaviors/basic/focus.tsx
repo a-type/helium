@@ -1,7 +1,8 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import { createContext, FC, RefObject, useState, useCallback } from 'react';
-import { ExtraProps } from '../../types';
-import { combine } from '../util';
+import { ExtraProps, BrandTheme } from '../../types';
+import { combine, generateId } from '../util';
+import { InterpolationWithTheme } from '@emotion/core';
 
 export type FocusContextValue = {
   groupName: string | null;
@@ -76,12 +77,25 @@ export const FocusProvider: FC<FocusProviderProps> = ({
   );
 };
 
+export const defaultFocusCss = {
+  outline: '0',
+  boxShadow: '0 0 0 2px var(--color-control-effect-strong)', // FIXME
+};
+
 export type UseFocusConfig = {
-  id: string;
+  id?: string;
   tabbable?: boolean;
+  focusCss?: InterpolationWithTheme<any>;
 } & ExtraProps;
 
-export const useFocus = ({ id, tabbable = true, ...rest }: UseFocusConfig) => {
+export const useFocus = ({
+  id: providedId,
+  tabbable = true,
+  focusCss = defaultFocusCss,
+  ...rest
+}: UseFocusConfig) => {
+  const id = providedId || generateId('focusable');
+
   const focusContext = useContext(FocusContext);
   const elementRef = useRef<HTMLElement>(null);
 
@@ -94,6 +108,9 @@ export const useFocus = ({ id, tabbable = true, ...rest }: UseFocusConfig) => {
     {
       ref: elementRef,
       tabIndex: tabbable ? 0 : -1,
+      css: {
+        '&:focus': focusCss,
+      },
     },
     rest,
   ]);

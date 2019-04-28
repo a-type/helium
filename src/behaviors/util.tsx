@@ -78,3 +78,7 @@ export const useCompose = <Props extends ExtraProps>(
     props,
   );
 };
+
+export const generateId = (base?: string): string => {
+  return `${base || ''}-${Math.floor(Math.random() * 100000000)}`;
+};

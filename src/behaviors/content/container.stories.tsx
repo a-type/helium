@@ -16,7 +16,7 @@ const Grid: FC<GridConfig> = props => {
   return <div {...gridProps} />;
 };
 
-storiesOf('useGrid', module).add('basic grid', () => (
+storiesOf('behaviors/useGrid', module).add('basic grid', () => (
   <Grid
     areas={[['a', 'b'], ['c', 'd']]}
     rows={['30px', '1fr']}
@@ -44,7 +44,7 @@ const Box: FC<BoxConfig> = props => {
   return <main {...boxProps} />;
 };
 
-storiesOf('useBox', module).add('basic box', () => (
+storiesOf('behaviors/useBox', module).add('basic box', () => (
   <Box
     align="center"
     justify="end"

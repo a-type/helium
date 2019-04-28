@@ -29,7 +29,7 @@ const TextInput: FC<{}> = ({}) => {
   return <input {...inputProps} />;
 };
 
-storiesOf('useInput', module).add('text input', () => <TextInput />);
+storiesOf('behaviors/useInput', module).add('text input', () => <TextInput />);
 
 const ToggleInput: FC<{}> = ({}) => {
   const [toggled, setToggled] = useState(false);
@@ -46,4 +46,6 @@ const ToggleInput: FC<{}> = ({}) => {
   return <input {...toggleInputProps} />;
 };
 
-storiesOf('useToggleInput', module).add('checkbox', () => <ToggleInput />);
+storiesOf('behaviors/useToggleInput', module).add('checkbox', () => (
+  <ToggleInput />
+));

@@ -4,7 +4,7 @@ const { WebpackPluginServe: Serve } = require('webpack-plugin-serve');
 
 module.exports = {
   mode: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
-  entry: path.resolve(__dirname, './index.tsx'),
+  entry: path.resolve(__dirname, './src/index.tsx'),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -30,7 +30,7 @@ module.exports = {
   watch: process.env.NODE_ENV !== 'production',
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, './src/index.html'),
       inject: 'body',
       filename: 'index.html',
     }),

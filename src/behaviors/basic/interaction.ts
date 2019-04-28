@@ -4,13 +4,13 @@ import { useFocus } from './focus';
 import { combine } from '../util';
 
 export type PressableConfig = {
-  id: string;
+  id?: string;
   tabbable?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 } & ExtraProps;
 
 export const usePressable = ({
-  onPress: onPressed,
+  onPress: onPress,
   id,
   tabbable = true,
   ...rest
@@ -24,18 +24,17 @@ export const usePressable = ({
         event.preventDefault();
       }
     },
-    [onPressed],
+    [onPress],
   );
   const onKeyUp = useCallback(
     (event: KeyboardEvent) => {
       if (event.keyCode === KeyCode.Space) {
         event.preventDefault();
-        onPressed && onPressed();
+        onPress && onPress();
       }
     },
-    [onPressed],
+    [onPress],
   );
-  const onClick = useCallback(() => onPressed(), [onPressed]);
 
   // pressable is intrinsically focusable
   const focusProps = useFocus({
@@ -47,7 +46,7 @@ export const usePressable = ({
     {
       onKeyDown,
       onKeyUp,
-      onClick,
+      onClick: onPress,
     },
     focusProps,
     rest,
