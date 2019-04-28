@@ -6,12 +6,12 @@ export type TextSizeConfig = {
 };
 
 export const useTextSize = ({ textSize, ...rest }: TextSizeConfig) => {
-  return combine([
+  return combine(
     {
-      css: theme => ({
-        fontSize: pathOr<string>(textSize, ['textSize', textSize], theme),
-      }),
+      css: {
+        fontSize: textSize,
+      },
     },
     rest,
-  ]);
+  );
 };

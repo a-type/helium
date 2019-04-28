@@ -22,7 +22,7 @@ export const useBox = ({
   const flexProps = useFlexLayout({ direction, align, justify });
   const spacingProps = useSpacing({ margin, padding });
 
-  return combine([flexProps, spacingProps, rest]);
+  return combine(flexProps, spacingProps, rest);
 };
 
 export type GridConfig = SpacingConfig & GridLayoutConfig & ExtraProps;
@@ -39,5 +39,5 @@ export const useGrid = ({
   const gridProps = useGridLayout({ areas, rows, columns, gap });
   const spacingProps = useSpacing({ margin, padding });
 
-  return combine([gridProps, spacingProps, rest]);
+  return combine(gridProps, spacingProps, rest);
 };

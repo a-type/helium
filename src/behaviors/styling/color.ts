@@ -12,17 +12,13 @@ export const useContentColors = ({
   foregroundColor,
   ...rest
 }: ContentColorsConfig) => {
-  return combine([
+  return combine(
     {
-      css: theme => ({
-        background:
-          backgroundColor &&
-          pathOr<string>(backgroundColor, ['colors', backgroundColor], theme),
-        color:
-          foregroundColor &&
-          pathOr<string>(foregroundColor, ['colors', foregroundColor], theme),
-      }),
+      css: {
+        background: backgroundColor,
+        color: foregroundColor,
+      },
     },
     rest,
-  ]);
+  );
 };

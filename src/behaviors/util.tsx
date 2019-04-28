@@ -52,7 +52,9 @@ export const combineEventHandlers = (
 
 type MaybeBehaviorProps = BehaviorProps | undefined;
 
-export const combine = (behaviorProps: MaybeBehaviorProps[]): BehaviorProps =>
+export const combine = (
+  ...behaviorProps: MaybeBehaviorProps[]
+): BehaviorProps =>
   behaviorProps.reduce<BehaviorProps>((finalProps, behaviorProp) => {
     if (!behaviorProp) {
       return finalProps;

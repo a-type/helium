@@ -56,7 +56,7 @@ export const useInput = (
     id,
   };
 
-  return combine([inputProps, focusProps, extraProps]);
+  return combine(inputProps, focusProps, extraProps);
 };
 
 export type ToggleInputConfig = {
@@ -81,7 +81,7 @@ export const useToggleInput = (
     tabbable,
   });
 
-  return combine([
+  return combine(
     {
       onChange: handlePress,
       role: 'checkbox',
@@ -90,5 +90,5 @@ export const useToggleInput = (
     },
     pressableProps,
     extraProps,
-  ]);
+  );
 };

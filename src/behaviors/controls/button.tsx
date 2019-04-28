@@ -47,7 +47,7 @@ export const useButton = ({
     tabbable,
   });
 
-  return combine([baseButtonProps, pressableProps, rest]);
+  return combine(baseButtonProps, pressableProps, rest);
 };
 
 export type ToggleButtonConfig = ButtonConfig & {

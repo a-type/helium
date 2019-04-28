@@ -2,7 +2,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 import { createContext, FC, RefObject, useState, useCallback } from 'react';
 import { ExtraProps, BrandTheme } from '../../types';
 import { combine, generateId } from '../util';
-import { InterpolationWithTheme } from '@emotion/core';
+import { InterpolationWithTheme, Interpolation } from '@emotion/core';
 
 export type FocusContextValue = {
   groupName: string | null;
@@ -85,7 +85,7 @@ export const defaultFocusCss = {
 export type UseFocusConfig = {
   id?: string;
   tabbable?: boolean;
-  focusCss?: InterpolationWithTheme<any>;
+  focusCss?: Interpolation;
 } & ExtraProps;
 
 export const useFocus = ({
@@ -104,7 +104,7 @@ export const useFocus = ({
     return () => focusContext.unregister(id);
   }, [elementRef]);
 
-  return combine([
+  return combine(
     {
       ref: elementRef,
       tabIndex: tabbable ? 0 : -1,
@@ -113,5 +113,5 @@ export const useFocus = ({
       },
     },
     rest,
-  ]);
+  );
 };

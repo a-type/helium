@@ -42,7 +42,7 @@ export const usePressable = ({
     tabbable,
   });
 
-  return combine([
+  return combine(
     {
       onKeyDown,
       onKeyUp,
@@ -50,5 +50,5 @@ export const usePressable = ({
     },
     focusProps,
     rest,
-  ]);
+  );
 };

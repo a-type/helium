@@ -5,7 +5,7 @@ export type ExtraProps = {
 };
 
 export type BehaviorProps = {
-  css?: InterpolationWithTheme<BrandTheme>;
+  css?: InterpolationWithTheme<any>;
   className?: string;
 } & ExtraProps;
 

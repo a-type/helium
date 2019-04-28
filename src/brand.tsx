@@ -21,10 +21,10 @@ export type BrandConfig = {
 } & ExtraProps;
 
 export const useBrand = ({ brand, ...rest }: BrandConfig) => {
-  return combine([
+  return combine(
     {
       css: convertBrandToVariables(brand),
     },
     rest,
-  ]);
+  );
 };
