@@ -1,19 +1,13 @@
-import { combine } from '../util';
+import { createBehavior } from '../util';
 
 export type TextSizeConfig = {
   textSize?: string;
 };
 
-export const useTextSize = ({
-  textSize = 'var(--size-text-md)',
-  ...rest
-}: TextSizeConfig) => {
-  return combine(
-    {
-      css: {
-        fontSize: textSize,
-      },
+export const useTextSize = createBehavior(
+  ({ textSize = 'var(--size-text-md)' }: TextSizeConfig) => ({
+    css: {
+      fontSize: textSize,
     },
-    rest,
-  );
-};
+  }),
+);

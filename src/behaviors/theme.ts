@@ -31,9 +31,9 @@ const defaultBrandTheme: BrandTheme = {
       border: 'black',
     },
     field: {
-      bg: 'white',
+      bg: '#eaeaea',
       fg: 'black',
-      border: 'black',
+      border: '#eaeaea',
       effectStrong: '#00000080',
       effectWeak: '#00000020',
     },

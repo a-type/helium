@@ -3,7 +3,13 @@ import { combine, useCompose } from '../util';
 import { useFocus, FocusConfig } from '../primitives';
 import { BehaviorProps } from '../types';
 import { createBehavior } from '../util';
-import { usePressable, useValue, ValueConfig } from '../behaviors';
+import {
+  usePressable,
+  useValue,
+  ValueConfig,
+  useTextSize,
+  TextSizeConfig,
+} from '../behaviors';
 
 const inputCss = {
   background: 'var(--color-field-bg)',
@@ -38,7 +44,8 @@ export type InputType =
   | 'reset';
 
 export type InputConfig = ValueConfig &
-  FocusConfig & {
+  FocusConfig &
+  TextSizeConfig & {
     type?: InputType;
   } & BehaviorProps;
 
@@ -49,7 +56,7 @@ export const useInput = createBehavior<InputConfig>((props: InputConfig) =>
       type: props.type || 'text',
       css: inputCss,
     },
-    [useFocus, useValue],
+    [useFocus, useValue, useTextSize],
   ),
 );
 
