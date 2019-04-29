@@ -1,5 +1,5 @@
 import { BehaviorProps, ExtraProps } from '../types';
-import { createBehavior } from './util';
+import { createBehavior } from '../util';
 
 export type FlexLayoutConfig = {
   direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';

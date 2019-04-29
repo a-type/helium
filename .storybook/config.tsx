@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { configure, addDecorator } from '@storybook/react';
-import { useTheme } from '../src/behaviors/brand';
+import { useTheme } from '../src/behaviors/theme';
 import { BrandTheme } from '../src/types';
 
 // automatically import all files ending in *.stories.js

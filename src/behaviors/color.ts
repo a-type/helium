@@ -1,6 +1,6 @@
-import { ExtraProps } from '../../types';
+import { ExtraProps } from '../types';
 import { createBehavior } from '../util';
-import { useTheme } from '../brand';
+import { useTheme } from './theme';
 
 export type ContentColorsConfig = {
   backgroundColor?: string;
@@ -18,7 +18,7 @@ export const useContentColors = createBehavior<ContentColorsConfig>(
 
 export type PrimaryColorsConfig = {} & ExtraProps;
 
-export const usePrimaryColors = createBehavior<PrimaryColorsConfig>(props =>
+export const usePrimaryColors = createBehavior<PrimaryColorsConfig>(() =>
   useTheme({
     theme: {
       color: {

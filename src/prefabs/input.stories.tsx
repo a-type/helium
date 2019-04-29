@@ -5,31 +5,22 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { css, jsx } from '@emotion/core';
 
-const inputCss = css({
-  padding: '8px',
-});
-
 const TextInput: FC<{}> = ({}) => {
   const [value, setValue] = useState('');
-  const inputProps = useInput(
-    {
-      id: 'testinput',
-      value,
-      onChange: val => {
-        action('onChange')(val);
-        setValue(val);
-      },
-      type: 'text',
+  const inputProps = useInput({
+    id: 'testinput',
+    value,
+    onChange: val => {
+      action('onChange')(val);
+      setValue(val);
     },
-    {
-      inputCss,
-    },
-  );
+    type: 'text',
+  });
 
   return <input {...inputProps} />;
 };
 
-storiesOf('behaviors/useInput', module).add('text input', () => <TextInput />);
+storiesOf('prefabs/useInput', module).add('text input', () => <TextInput />);
 
 const ToggleInput: FC<{}> = ({}) => {
   const [toggled, setToggled] = useState(false);
@@ -46,6 +37,6 @@ const ToggleInput: FC<{}> = ({}) => {
   return <input {...toggleInputProps} />;
 };
 
-storiesOf('behaviors/useToggleInput', module).add('checkbox', () => (
+storiesOf('prefabs/useToggleInput', module).add('checkbox', () => (
   <ToggleInput />
 ));

@@ -1,8 +1,9 @@
-import { useCallback, ChangeEvent, useState } from 'react';
-import { usePressable } from '../basic/interaction';
-import { combine } from '../util';
-import { useFocus } from '../basic/focus';
-import { BehaviorProps } from '../../types';
+import { useCallback } from 'react';
+import { combine, useCompose } from '../util';
+import { useFocus, FocusConfig } from '../primitives';
+import { BehaviorProps } from '../types';
+import { createBehavior } from '../util';
+import { usePressable, useValue, ValueConfig } from '../behaviors';
 
 const inputCss = {
   background: 'var(--color-field-bg)',
@@ -36,41 +37,23 @@ export type InputType =
   | 'submit'
   | 'reset';
 
-export type InputConfig = {
-  value: string;
-  onChange?: (value: string) => void;
-  type?: InputType;
-  id?: string;
-  tabbable?: boolean;
-};
+export type InputConfig = ValueConfig &
+  FocusConfig & {
+    type?: InputType;
+  } & BehaviorProps;
 
-export const useInput = (
-  { value, onChange, type = 'text', id, tabbable }: InputConfig,
-  extraProps?: BehaviorProps,
-) => {
-  const handleChange = useCallback(
-    (ev: ChangeEvent<HTMLInputElement>) => {
-      const newTextValue = ev.target.value;
-      onChange && onChange(newTextValue);
+export const useInput = createBehavior<InputConfig>((props: InputConfig) =>
+  useCompose(
+    {
+      ...props,
+      type: props.type || 'text',
+      css: inputCss,
     },
-    [onChange],
-  );
+    [useFocus, useValue],
+  ),
+);
 
-  const focusProps = useFocus({
-    id,
-    tabbable,
-  });
-
-  const inputProps = {
-    onChange: handleChange,
-    value,
-    type,
-    css: inputCss,
-  };
-
-  return combine(inputProps, focusProps, extraProps);
-};
-
+// FIXME: needs a better pattern
 export type ToggleInputConfig = {
   toggled: boolean;
   value: string;

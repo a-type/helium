@@ -36,7 +36,7 @@ const DivButton: FC<{}> = ({ children }) => {
   return <div {...buttonProps} />;
 };
 
-storiesOf('behaviors/useButton', module)
+storiesOf('prefabs/useButton', module)
   .add('basic button', () => <Button>Hello world</Button>)
   .add('div button', () => <DivButton>Hello div</DivButton>);
 
@@ -51,7 +51,7 @@ const ToggleButton: FC<{}> = ({ children }) => {
   const buttonProps = useToggleButton({
     toggled,
     onPress: action('onPressed'),
-    onChange: toggleState => {
+    onChange: (toggleState: boolean) => {
       setToggled(toggleState);
       action('onToggled')(toggleState);
     },
@@ -63,7 +63,6 @@ const ToggleButton: FC<{}> = ({ children }) => {
   return <button {...buttonProps} />;
 };
 
-storiesOf('behaviors/useToggleButton', module).add(
-  'basic toggle button',
-  () => <ToggleButton>Hello toggle</ToggleButton>,
-);
+storiesOf('prefabs/useToggleButton', module).add('basic toggle button', () => (
+  <ToggleButton>Hello toggle</ToggleButton>
+));

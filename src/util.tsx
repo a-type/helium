@@ -1,4 +1,4 @@
-import { BehaviorProps, Behavior, ExtraProps } from '../types';
+import { BehaviorProps, Behavior, ExtraProps } from './types';
 import { useMemo } from 'react';
 import { ArrayInterpolation } from '@emotion/css';
 import { InterpolationWithTheme } from '@emotion/core';

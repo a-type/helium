@@ -1,8 +1,13 @@
 import { useCallback, ReactNode } from 'react';
-import { BehaviorProps, ExtraProps } from '../../types';
+import { BehaviorProps, ExtraProps } from '../types';
 import { useCompose, createBehavior } from '../util';
-import { PressableConfig, usePressable } from '../basic/interaction';
-import { useTextSize, TextSizeConfig, usePrimaryColors } from '../styling';
+import {
+  PressableConfig,
+  usePressable,
+  useTextSize,
+  TextSizeConfig,
+  usePrimaryColors,
+} from '../behaviors';
 import { InterpolationWithTheme } from '@emotion/core';
 
 const defaultButtonCss = {
@@ -28,7 +33,7 @@ export type ButtonConfig = PressableConfig &
 /**
  * Turns a component into a button.
  */
-export const useButton = createBehavior(
+export const useButton = createBehavior<ButtonConfig>(
   ({
     pressOnEnter = true,
     css,
@@ -53,7 +58,7 @@ export type ToggleButtonConfig = ButtonConfig & {
   onChange: (toggleState: boolean) => void;
 };
 
-export const useToggleButton = createBehavior(
+export const useToggleButton = createBehavior<ToggleButtonConfig>(
   ({
     onPress: onPressed,
     onChange,

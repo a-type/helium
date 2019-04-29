@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
-import { KeyCode, ExtraProps } from '../../types';
-import { useFocus } from './focus';
+import { useCallback, ChangeEvent } from 'react';
+import { KeyCode, ExtraProps } from '../types';
 import { combine } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
+import { useFocus } from '../primitives/interaction';
+import { createBehavior } from '../util';
 
 const defaultPressableCss = {
   cursor: 'pointer',
@@ -69,3 +70,23 @@ export const usePressable = ({
     rest,
   );
 };
+
+export type ValueConfig = {
+  value: string;
+  onChange: (newValue: string) => void;
+};
+
+export const useValue = createBehavior(({ value, onChange }: ValueConfig) => {
+  const handleChange = useCallback(
+    (ev: ChangeEvent<HTMLInputElement>) => {
+      const newTextValue = ev.target.value;
+      onChange && onChange(newTextValue);
+    },
+    [onChange],
+  );
+
+  return {
+    value,
+    onChange: handleChange,
+  };
+});

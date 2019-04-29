@@ -1,6 +1,6 @@
 import { BrandTheme, ExtraProps, BrandThemeOverrides } from '../types';
-import { combine } from '.';
 import defaults from 'lodash.defaultsdeep';
+import { createBehavior } from '../util';
 
 const defaultBrandTheme: BrandTheme = {
   color: {
@@ -99,11 +99,6 @@ export type ThemeConfig = {
   theme: BrandThemeOverrides;
 } & ExtraProps;
 
-export const useTheme = ({ theme, ...rest }: ThemeConfig) => {
-  return combine(
-    {
-      css: convertBrandToVariables(defaults(theme, defaultBrandTheme)),
-    },
-    rest,
-  );
-};
+export const useTheme = createBehavior(({ theme }: ThemeConfig) => ({
+  css: convertBrandToVariables(defaults(theme, defaultBrandTheme)),
+}));
