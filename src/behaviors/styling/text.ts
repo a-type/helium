@@ -1,11 +1,13 @@
 import { combine } from '../util';
-import pathOr from '@ramda/pathor';
 
 export type TextSizeConfig = {
-  textSize: string;
+  textSize?: string;
 };
 
-export const useTextSize = ({ textSize, ...rest }: TextSizeConfig) => {
+export const useTextSize = ({
+  textSize = 'var(--size-text-md)',
+  ...rest
+}: TextSizeConfig) => {
   return combine(
     {
       css: {

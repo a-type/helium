@@ -9,7 +9,9 @@ export type BehaviorProps = {
   className?: string;
 } & ExtraProps;
 
-export type Behavior = (configAndProps: any) => any;
+export type Behavior<Config extends BehaviorProps> = (
+  configAndProps: Config,
+) => any;
 
 export enum KeyCode {
   Space = 32,
@@ -47,10 +49,8 @@ export type BrandTheme = {
   size: {
     text: BrandSizeConfig;
     spacing: BrandSizeConfig;
-  };
-  border: {
-    radius: BrandSizeConfig;
-    width: {
+    borderRadius: BrandSizeConfig;
+    borderWidth: {
       thin: string;
       normal: string;
       thick: string;
@@ -66,6 +66,39 @@ export type BrandTheme = {
       content: string;
       heading: string;
       control: string;
+    };
+  };
+};
+
+export type BrandThemeOverrides = {
+  color?: {
+    content?: Partial<BrandColorConfig>;
+    control?: Partial<BrandInteractiveColorConfig> & {
+      primary?: Partial<BrandInteractiveColorConfig>;
+      minimal?: Partial<BrandInteractiveColorConfig>;
+    };
+    field?: Partial<BrandInteractiveColorConfig>;
+  };
+  size?: {
+    text?: Partial<BrandSizeConfig>;
+    spacing?: Partial<BrandSizeConfig>;
+    borderRadius?: Partial<BrandSizeConfig>;
+    borderWidth?: {
+      thin?: string;
+      normal?: string;
+      thick?: string;
+    };
+  };
+  font?: {
+    weight?: {
+      light?: string;
+      normal?: string;
+      heavy?: string;
+    };
+    family?: {
+      content?: string;
+      heading?: string;
+      control?: string;
     };
   };
 };

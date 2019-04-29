@@ -5,39 +5,21 @@ import {
   useSpacing,
   GridLayoutConfig,
   useGridLayout,
+  useSizing,
 } from '../layout';
-import { combine } from '../util';
+import { useCompose, createBehavior } from '../util';
 import { BehaviorProps, ExtraProps } from '../../types';
 
 export type BoxConfig = SpacingConfig & FlexLayoutConfig & ExtraProps;
 
-export const useBox = ({
-  margin,
-  padding,
-  direction,
-  align,
-  justify,
-  ...rest
-}: BoxConfig = {}): BehaviorProps => {
-  const flexProps = useFlexLayout({ direction, align, justify });
-  const spacingProps = useSpacing({ margin, padding });
-
-  return combine(flexProps, spacingProps, rest);
-};
+export const useBox = createBehavior(
+  (props: BoxConfig = {}): BehaviorProps =>
+    useCompose(props, [useFlexLayout, useSpacing, useSizing]),
+);
 
 export type GridConfig = SpacingConfig & GridLayoutConfig & ExtraProps;
 
-export const useGrid = ({
-  margin,
-  padding,
-  areas,
-  rows,
-  columns,
-  gap,
-  ...rest
-}: GridConfig = {}): BehaviorProps => {
-  const gridProps = useGridLayout({ areas, rows, columns, gap });
-  const spacingProps = useSpacing({ margin, padding });
-
-  return combine(gridProps, spacingProps, rest);
-};
+export const useGrid = createBehavior(
+  (props: GridConfig = {}): BehaviorProps =>
+    useCompose(props, [useGridLayout, useSpacing, useSizing]),
+);

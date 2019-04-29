@@ -1,4 +1,5 @@
 import { BehaviorProps, ExtraProps } from '../types';
+import { createBehavior } from './util';
 
 export type FlexLayoutConfig = {
   direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
@@ -6,13 +7,13 @@ export type FlexLayoutConfig = {
   justify?: 'start' | 'end' | 'center' | 'stretch' | 'space-between';
 } & ExtraProps;
 
-export const useFlexLayout = ({
-  direction = 'column',
-  align = 'start',
-  justify = 'start',
-  ...rest
-}: FlexLayoutConfig = {}): BehaviorProps => {
-  return {
+export const useFlexLayout = createBehavior(
+  ({
+    direction = 'column',
+    align = 'start',
+    justify = 'start',
+    ...rest
+  }: FlexLayoutConfig = {}): BehaviorProps => ({
     css: {
       display: 'flex',
       flexDirection: direction,
@@ -20,8 +21,8 @@ export const useFlexLayout = ({
       justifyContent: justify,
     },
     ...rest,
-  };
-};
+  }),
+);
 
 export type GridLayoutConfig = {
   areas?: string[] | string[][];
@@ -33,33 +34,35 @@ export type GridLayoutConfig = {
 const isTwoDimensionalArray = <T>(array: T[][] | T[]): array is T[][] =>
   array[0] instanceof Array;
 
-export const useGridLayout = ({
-  areas = [],
-  rows = [],
-  columns = [],
-  gap = '0',
-  ...rest
-}: GridLayoutConfig = {}): BehaviorProps => {
-  const normalizedAreas: string[][] = isTwoDimensionalArray(areas)
-    ? areas
-    : [areas];
-  const areasString = normalizedAreas.reduce(
-    (str, row) => str + ` "${row.join(' ')}"`,
-    '',
-  );
-  const gapString: string = gap instanceof Array ? gap.join(' ') : gap;
+export const useGridLayout = createBehavior(
+  ({
+    areas = [],
+    rows = [],
+    columns = [],
+    gap = '0',
+    ...rest
+  }: GridLayoutConfig = {}): BehaviorProps => {
+    const normalizedAreas: string[][] = isTwoDimensionalArray(areas)
+      ? areas
+      : [areas];
+    const areasString = normalizedAreas.reduce(
+      (str, row) => str + ` "${row.join(' ')}"`,
+      '',
+    );
+    const gapString: string = gap instanceof Array ? gap.join(' ') : gap;
 
-  return {
-    css: {
-      display: 'grid',
-      gridTemplateAreas: areasString,
-      gridTemplateRows: rows.join(' '),
-      gridTemplateColumns: columns.join(' '),
-      gap: gapString,
-    },
-    ...rest,
-  };
-};
+    return {
+      css: {
+        display: 'grid',
+        gridTemplateAreas: areasString,
+        gridTemplateRows: rows.join(' '),
+        gridTemplateColumns: columns.join(' '),
+        gap: gapString,
+      },
+      ...rest,
+    };
+  },
+);
 
 export type Spacing =
   | string
@@ -99,16 +102,26 @@ const parseSpacing = (
   };
 };
 
-export const useSpacing = ({
-  margin,
-  padding,
-  ...rest
-}: SpacingConfig = {}): BehaviorProps => {
-  return {
+export const useSpacing = createBehavior(
+  ({ margin, padding, ...rest }: SpacingConfig = {}): BehaviorProps => ({
     css: {
       ...parseSpacing(margin, 'margin'),
       ...parseSpacing(padding, 'padding'),
     },
     ...rest,
-  };
-};
+  }),
+);
+
+export type SizingConfig = {
+  width?: string;
+  height?: string;
+} & ExtraProps;
+
+export const useSizing = createBehavior(
+  ({ width = 'auto', height = 'auto' }: SizingConfig): BehaviorProps => ({
+    css: {
+      width,
+      height,
+    },
+  }),
+);

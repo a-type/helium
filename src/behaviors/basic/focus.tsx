@@ -1,8 +1,8 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import { createContext, FC, RefObject, useState, useCallback } from 'react';
-import { ExtraProps, BrandTheme } from '../../types';
+import { ExtraProps } from '../../types';
 import { combine, generateId } from '../util';
-import { InterpolationWithTheme, Interpolation } from '@emotion/core';
+import { InterpolationWithTheme } from '@emotion/core';
 
 export type FocusContextValue = {
   groupName: string | null;
@@ -78,14 +78,17 @@ export const FocusProvider: FC<FocusProviderProps> = ({
 };
 
 export const defaultFocusCss = {
-  outline: '0',
-  boxShadow: '0 0 0 2px var(--color-control-effect-strong)', // FIXME
+  '&:focus': {
+    outline: '0',
+    boxShadow: '0 0 0 2px var(--color-control-effect-strong)', // FIXME
+  },
+  transition: '0.2s ease box-shadow',
 };
 
 export type UseFocusConfig = {
   id?: string;
   tabbable?: boolean;
-  focusCss?: Interpolation;
+  focusCss?: InterpolationWithTheme<any>;
 } & ExtraProps;
 
 export const useFocus = ({
@@ -108,9 +111,7 @@ export const useFocus = ({
     {
       ref: elementRef,
       tabIndex: tabbable ? 0 : -1,
-      css: {
-        '&:focus': focusCss,
-      },
+      css: focusCss,
     },
     rest,
   );

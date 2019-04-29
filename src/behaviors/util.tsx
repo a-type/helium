@@ -69,18 +69,34 @@ export const combine = (
     };
   }, {});
 
+type SkippableBehavior<Props> = [Behavior<Props>, boolean];
+
 export const useCompose = <Props extends ExtraProps>(
   props: Props,
-  behaviorHooks: Behavior[],
+  behaviorHooks: (Behavior<Props> | SkippableBehavior<Props>)[],
 ) => {
   // memoize once. hooks must always be run in the same order.
   const memoizedBehaviorHooks = useMemo(() => behaviorHooks, []);
-  return memoizedBehaviorHooks.reduce(
-    (currentProps, behavior) => behavior(currentProps),
-    props,
-  );
+  return memoizedBehaviorHooks.reduce((currentProps, behavior) => {
+    if (behavior instanceof Array) {
+      return behavior[0]({ ...currentProps, skip: behavior[1] });
+    } else {
+      return behavior(currentProps);
+    }
+  }, props);
 };
 
 export const generateId = (base?: string): string => {
   return `${base || ''}-${Math.floor(Math.random() * 100000000)}`;
+};
+
+export const createBehavior = <BehaviorConfig extends BehaviorProps>(
+  implementation: Behavior<BehaviorConfig>,
+) => ({ skip = false, ...props }: BehaviorConfig & { skip?: boolean }) => {
+  if (skip) {
+    return props;
+  }
+
+  const result = implementation(props as BehaviorConfig);
+  return combine(props, result);
 };

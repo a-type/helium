@@ -1,15 +1,8 @@
-import React, { FC } from 'react';
-import { configure, addDecorator } from '@storybook/react';
-import { useTheme } from '../src/behaviors/brand';
-import { BrandTheme } from '../src/types';
+import { BrandTheme, ExtraProps, BrandThemeOverrides } from '../types';
+import { combine } from '.';
+import defaults from 'lodash.defaultsdeep';
 
-// automatically import all files ending in *.stories.js
-const req = require.context('../src', true, /\.stories\.tsx?$/);
-function loadStories() {
-  req.keys().forEach(filename => req(filename));
-}
-
-const brand: BrandTheme = {
+const defaultBrandTheme: BrandTheme = {
   color: {
     control: {
       bg: 'transparent',
@@ -87,10 +80,30 @@ const brand: BrandTheme = {
   },
 };
 
-const BrandProvider: FC<{ theme: BrandTheme }> = props => (
-  <div {...useTheme(props)} />
-);
+const convertBrandToVariables = (
+  brand: { [key: string]: any },
+  prefix: string = '-',
+): { [name: string]: string } => {
+  return Object.keys(brand).reduce<{ [name: string]: string }>((vars, key) => {
+    const value = brand[key];
+    const prefixedKey = `${prefix}-${key}`;
+    if (typeof value === 'object') {
+      return { ...vars, ...convertBrandToVariables(value, prefixedKey) };
+    }
 
-addDecorator(story => <BrandProvider theme={brand}>{story()}</BrandProvider>);
+    return { ...vars, [prefixedKey]: value };
+  }, {});
+};
 
-configure(loadStories, module);
+export type ThemeConfig = {
+  theme: BrandThemeOverrides;
+} & ExtraProps;
+
+export const useTheme = ({ theme, ...rest }: ThemeConfig) => {
+  return combine(
+    {
+      css: convertBrandToVariables(defaults(theme, defaultBrandTheme)),
+    },
+    rest,
+  );
+};

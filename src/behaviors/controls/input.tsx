@@ -4,6 +4,18 @@ import { combine } from '../util';
 import { useFocus } from '../basic/focus';
 import { BehaviorProps } from '../../types';
 
+const inputCss = {
+  background: 'var(--color-field-bg)',
+  color: 'var(--color-field-fg)',
+  borderColor: 'var(--color-field-border)',
+  borderWidth: 'var(--border-width-normal)',
+  borderStyle: 'solid',
+  paddingTop: 'var(--size-spacing-md)',
+  paddingBottom: 'var(--size-spacing-md)',
+  paddingLeft: 'var(--size-spacing-lg)',
+  paddingRight: 'var(--size-spacing-lg)',
+};
+
 export type InputType =
   | 'text'
   | 'color'
@@ -27,13 +39,13 @@ export type InputType =
 export type InputConfig = {
   value: string;
   onChange?: (value: string) => void;
-  type: InputType;
-  id: string;
+  type?: InputType;
+  id?: string;
   tabbable?: boolean;
 };
 
 export const useInput = (
-  { value, onChange, type, id, tabbable }: InputConfig,
+  { value, onChange, type = 'text', id, tabbable }: InputConfig,
   extraProps?: BehaviorProps,
 ) => {
   const handleChange = useCallback(
@@ -53,7 +65,7 @@ export const useInput = (
     onChange: handleChange,
     value,
     type,
-    id,
+    css: inputCss,
   };
 
   return combine(inputProps, focusProps, extraProps);

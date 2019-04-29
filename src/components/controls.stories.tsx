@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { FC } from 'react';
-import { Button } from './controls';
+import { Button, Input } from './controls';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { css, jsx } from '@emotion/core';
@@ -12,3 +12,5 @@ storiesOf('Button', module)
       Hello primary
     </Button>
   ));
+
+storiesOf('Input', module).add('normal', () => <Input value="Hello world" />);
