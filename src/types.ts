@@ -68,6 +68,14 @@ export type BrandTheme = {
       control: string;
     };
   };
+  shadow: {
+    level: {
+      [1]: string;
+      [2]: string;
+      [3]: string;
+      [4]: string;
+    };
+  };
 };
 
 export type BrandThemeOverrides = {

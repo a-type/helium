@@ -78,6 +78,14 @@ const defaultBrandTheme: BrandTheme = {
       xl: '16px',
     },
   },
+  shadow: {
+    level: {
+      [1]: '0 2px 4px 0 #00000040',
+      [2]: '0 3px 8px 0 #00000040',
+      [3]: '0 4px 12px 0 #00000040',
+      [4]: '0 6px 20px 0 #00000040',
+    },
+  },
 };
 
 const convertBrandToVariables = (

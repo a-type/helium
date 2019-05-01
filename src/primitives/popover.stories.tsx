@@ -15,7 +15,6 @@ const Popped = (props: Partial<PopoverConfig>) => {
       anchorRef: anchorProps.ref,
       css: {
         border: '1px solid black',
-        boxShadow: '0 0 8px 0 #00000080',
         padding: '8px',
         background: 'white',
       },

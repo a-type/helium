@@ -1,4 +1,4 @@
-export * from './color';
+export * from './styling';
 export * from './interaction';
 export * from './layout';
 export * from './text';

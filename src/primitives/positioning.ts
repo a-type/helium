@@ -8,18 +8,26 @@ export type Depth = number | NamedDepth;
 
 export type DepthConfig = {
   depth?: Depth;
+  shadow?: boolean;
 } & BehaviorProps;
 
-export const useDepth = createBehavior((config: DepthConfig) => ({
-  css: {
-    zIndex:
-      config.depth === 'neutral'
-        ? 0
-        : config.depth === 'transcendent'
-        ? MAX_Z_INDEX
-        : config.depth,
-  },
-}));
+export const useDepth = createBehavior((config: DepthConfig) => {
+  const zIndex =
+    config.depth === 'neutral'
+      ? 0
+      : config.depth === 'transcendent'
+      ? MAX_Z_INDEX
+      : config.depth || 0;
+  return {
+    css: {
+      zIndex,
+      boxShadow:
+        (config.shadow === undefined || config.shadow) && zIndex > 0
+          ? `var(--shadow-level-${Math.min(zIndex, 4)})`
+          : 'none',
+    },
+  };
+});
 
 export type Spacing =
   | string

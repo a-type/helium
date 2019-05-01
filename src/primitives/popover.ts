@@ -15,10 +15,10 @@ export type PopoverAnchorConfig = {} & BehaviorProps;
 
 export const usePopoverAnchor = createBehavior(
   ({ ref }: PopoverAnchorConfig = {}) => {
-    const anchorRef = useRef<HTMLElement>(ref || null);
+    const anchorRef = useRef<HTMLElement>(null);
 
     return {
-      ref: anchorRef,
+      ref: ref || anchorRef,
     };
   },
 );

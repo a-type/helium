@@ -1,8 +1,16 @@
 /** @jsx jsx */
-import { FC } from 'react';
-import { useGrid, useBox, GridConfig, BoxConfig } from './container';
+import { FC, useState } from 'react';
+import {
+  useGrid,
+  useBox,
+  GridConfig,
+  BoxConfig,
+  useDockPanel,
+} from './container';
 import { storiesOf } from '@storybook/react';
 import { jsx } from '@emotion/core';
+import { usePopoverAnchor } from '../primitives';
+import { Button } from '../components';
 
 const Grid: FC<GridConfig> = props => {
   const gridProps = useGrid({
@@ -37,7 +45,6 @@ const Box: FC<BoxConfig> = props => {
     css: {
       width: '100%',
       height: '300px',
-      background: 'lightgray',
     },
   });
 
@@ -53,4 +60,29 @@ storiesOf('prefabs/useBox', module).add('basic box', () => (
     <div>Hello</div>
     <div>World</div>
   </Box>
+));
+
+const DockPanelExample = (props: any) => {
+  const [show, setShow] = useState(false);
+
+  const anchorProps = usePopoverAnchor({});
+  const dockPanelProps = useDockPanel({ anchorRef: anchorProps.ref });
+
+  console.log(dockPanelProps);
+
+  return (
+    <div>
+      <Button {...anchorProps} onPress={() => setShow(!show)}>
+        Toggle
+      </Button>
+      <div>
+        There's some more content below the button to show the docking overlay.
+      </div>
+      {show && <div {...dockPanelProps}>This is a docked panel</div>}
+    </div>
+  );
+};
+
+storiesOf('prefabs/useDockPanel', module).add('simple example', () => (
+  <DockPanelExample />
 ));

@@ -77,13 +77,14 @@ export const useCompose = <Props extends ExtraProps>(
 ) => {
   // memoize once. hooks must always be run in the same order.
   const memoizedBehaviorHooks = useMemo(() => behaviorHooks, []);
-  return memoizedBehaviorHooks.reduce((currentProps, behavior) => {
+  const behaviorProps = memoizedBehaviorHooks.map(behavior => {
     if (behavior instanceof Array) {
-      return behavior[0]({ ...currentProps, skip: behavior[1] });
+      return behavior[0]({ ...props, skip: behavior[1] });
     } else {
-      return behavior(currentProps);
+      return behavior(props);
     }
-  }, props);
+  });
+  return combine(...behaviorProps);
 };
 
 export const generateId = (base?: string): string => {

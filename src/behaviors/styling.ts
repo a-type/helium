@@ -2,16 +2,18 @@ import { ExtraProps } from '../types';
 import { createBehavior } from '../util';
 import { useTheme } from './theme';
 
-export type ContentColorsConfig = {
-  backgroundColor?: string;
-  foregroundColor?: string;
+export type ContentAreaConfig = {
+  border?: boolean;
 } & ExtraProps;
 
-export const useContentColors = createBehavior<ContentColorsConfig>(
-  ({ backgroundColor, foregroundColor }: ContentColorsConfig) => ({
+export const useContentArea = createBehavior<ContentAreaConfig>(
+  ({ border }: ContentAreaConfig) => ({
     css: {
-      background: backgroundColor,
-      color: foregroundColor,
+      background: 'var(--color-content-bg)',
+      color: 'var(--color-content-fg)',
+      border: border
+        ? `var(--size-border-width-thin) solid var(--color-content-border)`
+        : '0',
     },
   }),
 );

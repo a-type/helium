@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, RefObject } from 'react';
 import { ExtraProps } from '../types';
 import { combine, generateId } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
@@ -16,12 +16,14 @@ export type FocusConfig = {
   id?: string;
   tabbable?: boolean;
   focusCss?: InterpolationWithTheme<any>;
+  ref?: RefObject<any>;
 } & ExtraProps;
 
 export const useFocus = ({
   id: providedId,
   tabbable = true,
   focusCss = defaultFocusCss,
+  ref,
   ...rest
 }: FocusConfig) => {
   const id = providedId || generateId('focusable');
@@ -29,14 +31,17 @@ export const useFocus = ({
   const focusContext = useContext(FocusContext);
   const elementRef = useRef<HTMLElement>(null);
 
+  // always use provided ref if it's there
+  const usedRef = ref || elementRef;
+
   useEffect(() => {
-    focusContext.register(id, elementRef);
+    focusContext.register(id, usedRef);
     return () => focusContext.unregister(id);
-  }, [elementRef]);
+  }, [usedRef]);
 
   return combine(
     {
-      ref: elementRef,
+      ref: usedRef,
       tabIndex: tabbable ? 0 : -1,
       css: focusCss,
     },
