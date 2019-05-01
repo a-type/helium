@@ -42,6 +42,6 @@ storiesOf('primitives/popover', module)
     <div
       css={{ display: 'flex', height: '800px', '& > *': { margin: 'auto' } }}
     >
-      <Popped placement="top" />
+      <Popped popoverPlacement="top" />
     </div>
   ));

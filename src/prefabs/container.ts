@@ -41,12 +41,12 @@ export type DockPanelConfig = SpacingConfig &
 export const useDockPanel = createBehavior<DockPanelConfig>(
   ({
     padding = 'var(--size-spacing-md)',
-    placement = 'bottom-start',
+    popoverPlacement = 'bottom-start',
     depth = 1,
     border = true,
     ...props
   }: DockPanelConfig) =>
-    useCompose({ ...props, padding, depth, border, placement }, [
+    useCompose({ ...props, padding, depth, border, popoverPlacement }, [
       usePopover,
       useSpacing,
       useContentArea,

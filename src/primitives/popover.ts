@@ -25,36 +25,36 @@ export const usePopoverAnchor = createBehavior(
 
 export type PopoverConfig = {
   anchorRef: RefObject<HTMLElement>;
-  popper?: PopperOptions;
-  placement?: Popper.Placement;
-  offset?: string | number;
-  overflowPadding?: number;
-  flip?: boolean;
-  inner?: boolean;
-  fast?: boolean;
+  popperOptions?: PopperOptions;
+  popoverPlacement?: Popper.Placement;
+  popoverOffset?: string | number;
+  popoverOverflowPadding?: number;
+  popoverFlip?: boolean;
+  popoverInner?: boolean;
+  popoverFast?: boolean;
 } & BehaviorProps;
 
 const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
-  props.popper || {
-    placement: props.placement || 'bottom',
+  props.popperOptions || {
+    placement: props.popoverPlacement || 'bottom',
     modifiers: {
       shift: {
         enabled: true,
       },
       offset: {
-        enabled: !!props.offset,
-        offset: props.offset,
+        enabled: !!props.popoverOffset,
+        offset: props.popoverOffset,
       },
       preventOverflow: {
         enabled: true,
-        padding: props.overflowPadding || 5,
+        padding: props.popoverOverflowPadding || 5,
       },
       flip: {
-        enabled: props.flip === undefined || props.flip,
-        padding: props.overflowPadding || 5,
+        enabled: props.popoverFlip === undefined || props.popoverFlip,
+        padding: props.popoverOverflowPadding || 5,
       },
       inner: {
-        enabled: props.inner,
+        enabled: props.popoverInner,
       },
     },
   };
@@ -68,7 +68,7 @@ const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
  * want your component to re-render when Popper positioning changes, set 'fast' to false.
  */
 export const usePopover = createBehavior((props: PopoverConfig) => {
-  const { anchorRef, fast = true } = props;
+  const { anchorRef, popoverFast: fast = true } = props;
 
   const popoverRef = useRef<HTMLElement>(null);
   const popperInstanceRef = useRef<Popper | null>(null);
@@ -78,12 +78,12 @@ export const usePopover = createBehavior((props: PopoverConfig) => {
    */
   const [popperData, setPopperData] = useState<Popper.Data | null>(null);
   const popperConfig = useMemo(() => createBasePopperOptions(props), [
-    props.popper,
-    props.placement,
-    props.offset,
-    props.overflowPadding,
-    props.flip,
-    props.inner,
+    props.popperOptions,
+    props.popoverPlacement,
+    props.popoverOffset,
+    props.popoverOverflowPadding,
+    props.popoverFlip,
+    props.popoverInner,
   ]);
 
   useLayoutEffect(() => {
