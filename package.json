@@ -27,7 +27,9 @@
     "@ramda/pathor": "^0.26.1",
     "emotion-theming": "^10.0.10",
     "lodash.defaultsdeep": "^4.6.0",
-    "ramda.path": "^0.26.1"
+    "popper.js": "^1.15.0",
+    "ramda.path": "^0.26.1",
+    "resize-observer-polyfill": "^1.5.1"
   },
   "peerDependencies": {
     "react": "^16.8.0",

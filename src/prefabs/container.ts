@@ -1,12 +1,10 @@
 import {
-  SpacingConfig,
   FlexLayoutConfig,
   useFlexLayout,
-  useSpacing,
   GridLayoutConfig,
   useGridLayout,
-  useSizing,
 } from '../behaviors/layout';
+import { SpacingConfig, useSpacing, useSizing } from '../primitives';
 import { useCompose, createBehavior } from '../util';
 import { BehaviorProps } from '../types';
 

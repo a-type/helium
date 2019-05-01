@@ -98,5 +98,5 @@ export const createBehavior = <BehaviorConfig extends BehaviorProps>(
   }
 
   const result = implementation(props as BehaviorConfig);
-  return combine(props, result);
+  return combine(result, props);
 };
