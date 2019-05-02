@@ -4,12 +4,12 @@ import { usePopoverAnchor, usePopover, PopoverConfig } from './popover';
 import { useDepth } from './positioning';
 import { useState } from 'react';
 import { jsx } from '@emotion/core';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 
 const Popped = (props: Partial<PopoverConfig>) => {
   const [show, setShow] = useState(false);
   const anchorProps = usePopoverAnchor({ onClick: () => setShow(!show) });
-  const popoverProps = useCompose(
+  const popoverProps = useAll(
     {
       depth: 10,
       anchorRef: anchorProps.ref,

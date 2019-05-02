@@ -8,13 +8,13 @@ import {
   useFlexLayout,
 } from '../primitives';
 import { forwardRef } from 'react';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 
 export type BoxProps = SpacingConfig & FlexLayoutConfig;
 
 export const Box = forwardRef<HTMLDivElement, BoxProps>(
   (props: BoxProps, ref) => {
-    const boxProps = useCompose({ ...props, ref }, [
+    const boxProps = useAll({ ...props, ref }, [
       useFlexLayout,
       useSpacing,
       useSizing,

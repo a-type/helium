@@ -12,7 +12,7 @@ import {
   useTheme,
   useToggleable,
 } from '../primitives';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 import { jsx, InterpolationWithTheme } from '@emotion/core';
 import { BrandTheme, BehaviorProps } from '../types';
 import { ThemeProvider } from '../contexts';
@@ -42,7 +42,7 @@ export type ButtonProps = PressableConfig &
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ pressOnEnter = true, css, primary, ...props }, ref) => {
-    const buttonProps = useCompose<ButtonProps>(
+    const buttonProps = useAll<ButtonProps>(
       {
         pressOnEnter,
         css: Array<InterpolationWithTheme<any>>()

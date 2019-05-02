@@ -99,7 +99,7 @@ export const useCombine = (
 
 type SkippableBehavior<Props> = [Behavior<Props>, boolean];
 
-export const useCompose = <Props extends ExtraProps>(
+export const useAll = <Props extends ExtraProps>(
   props: Props,
   behaviorHooks: (Behavior<Props> | SkippableBehavior<Props>)[],
 ) => {

@@ -8,12 +8,12 @@ import {
   useGridLayout,
 } from '../primitives';
 import { forwardRef } from 'react';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 
 export type GridConfig = SpacingConfig & GridLayoutConfig;
 
 export const Grid = forwardRef((props: GridConfig, ref) => {
-  const gridProps = useCompose({ ...props, ref }, [
+  const gridProps = useAll({ ...props, ref }, [
     useGridLayout,
     useSpacing,
     useSizing,

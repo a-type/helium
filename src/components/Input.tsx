@@ -10,7 +10,7 @@ import {
   SpacingConfig,
 } from '../primitives';
 import { forwardRef } from 'react';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 import { jsx } from '@emotion/core';
 import { BrandTheme } from '../types';
 
@@ -50,7 +50,7 @@ export type InputConfig = ValueConfig &
   };
 
 export const Input = forwardRef<HTMLInputElement, InputConfig>((props, ref) => {
-  const inputProps = useCompose<InputConfig>(
+  const inputProps = useAll<InputConfig>(
     {
       ...props,
       type: props.type || 'text',

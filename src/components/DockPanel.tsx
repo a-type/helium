@@ -12,7 +12,7 @@ import {
   useContentArea,
   ContentAreaConfig,
 } from '../primitives';
-import { useCompose } from '../util';
+import { useAll } from '../util';
 import { forwardRef } from 'react';
 
 export type DockPanelProps = SpacingConfig &
@@ -32,7 +32,7 @@ export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>(
     },
     ref,
   ) => {
-    const dockPanelProps = useCompose(
+    const dockPanelProps = useAll(
       { ...props, padding, depth, border, popoverPlacement, ref },
       [usePopover, useSpacing, useContentArea, useDepth, useFlexLayout],
     );
