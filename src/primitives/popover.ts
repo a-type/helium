@@ -1,13 +1,6 @@
 import { BehaviorProps } from '../types';
 import { createBehavior } from '../util';
-import {
-  useRef,
-  useEffect,
-  RefObject,
-  useState,
-  useMemo,
-  useLayoutEffect,
-} from 'react';
+import { useRef, RefObject, useState, useMemo, useLayoutEffect } from 'react';
 import Popper, { PopperOptions } from 'popper.js';
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -27,7 +20,7 @@ export type PopoverConfig = {
   anchorRef: RefObject<HTMLElement>;
   popperOptions?: PopperOptions;
   popoverPlacement?: Popper.Placement;
-  popoverOffset?: string | number;
+  popoverOffset?: string | number; // TODO: better interface than string
   popoverOverflowPadding?: number;
   popoverFlip?: boolean;
   popoverInner?: boolean;

@@ -1,17 +1,36 @@
-import { BehaviorProps, Behavior, ExtraProps } from './types';
-import { useMemo } from 'react';
+import {
+  BehaviorProps,
+  Behavior,
+  ExtraProps,
+  Size,
+  AssignedProps,
+} from './types';
+import { useMemo, useContext } from 'react';
 import { ArrayInterpolation } from '@emotion/css';
-import { InterpolationWithTheme } from '@emotion/core';
+import { InterpolationWithTheme, ThemeContext } from '@emotion/core';
 
 export const castCssArray = (
-  cssOrList: InterpolationWithTheme<any> | undefined,
+  cssOrList:
+    | InterpolationWithTheme<any>
+    | InterpolationWithTheme<any>[]
+    | undefined,
 ): ArrayInterpolation<any> =>
-  cssOrList instanceof Array ? cssOrList : !!cssOrList ? [cssOrList] : [];
+  cssOrList instanceof Array ? [...cssOrList] : !!cssOrList ? [cssOrList] : [];
 
 export const combineCss = (
   baseCss: InterpolationWithTheme<any> | undefined,
-  css: InterpolationWithTheme<any> | undefined,
-): ArrayInterpolation<any> => castCssArray(baseCss).concat(castCssArray(css));
+  css: InterpolationWithTheme<any> | InterpolationWithTheme<any>[] | undefined,
+  theme: any,
+): ArrayInterpolation<any> => {
+  return castCssArray(baseCss)
+    .concat(castCssArray(css))
+    .map(interpolation => {
+      if (typeof interpolation === 'function') {
+        return interpolation(theme);
+      }
+      return interpolation;
+    });
+};
 
 export const combineClassName = (
   baseClassName: string | undefined,
@@ -39,6 +58,11 @@ export const combineEventHandlers = (
   return baseHandlers.reduce<{ [key: string]: any }>((handlers, name) => {
     if (!newHandlers.includes(name)) {
       return handlers;
+    } else if (!baseHandlers.includes(name)) {
+      return {
+        ...handlers,
+        [name]: newHandlers[name],
+      };
     }
     return {
       ...handlers,
@@ -52,10 +76,12 @@ export const combineEventHandlers = (
 
 type MaybeBehaviorProps = BehaviorProps | undefined;
 
-export const combine = (
+export const useCombine = (
   ...behaviorProps: MaybeBehaviorProps[]
-): BehaviorProps =>
-  behaviorProps.reduce<BehaviorProps>((finalProps, behaviorProp) => {
+): AssignedProps => {
+  const theme = useContext(ThemeContext);
+
+  return behaviorProps.reduce<AssignedProps>((finalProps, behaviorProp) => {
     if (!behaviorProp) {
       return finalProps;
     }
@@ -63,12 +89,13 @@ export const combine = (
     return {
       ...finalProps,
       ...behaviorProp,
-      css: combineCss(finalProps.css, behaviorProp.css),
+      css: combineCss(finalProps.css, behaviorProp.css, theme),
       className: combineClassName(finalProps.className, behaviorProp.className),
       ...combineEventHandlers(finalProps, behaviorProp),
       ref: finalProps.ref || behaviorProp.ref,
     };
   }, {});
+};
 
 type SkippableBehavior<Props> = [Behavior<Props>, boolean];
 
@@ -85,7 +112,7 @@ export const useCompose = <Props extends ExtraProps>(
       return behavior(props);
     }
   });
-  return combine(...behaviorProps);
+  return useCombine(...behaviorProps);
 };
 
 export const generateId = (base?: string): string => {
@@ -100,5 +127,8 @@ export const createBehavior = <BehaviorConfig extends BehaviorProps>(
   }
 
   const result = implementation(props as BehaviorConfig);
-  return combine(result, props);
+  return useCombine(result, props);
 };
+
+export const isSize = (size: string | undefined): size is Size =>
+  !!size && ['xs', 'sm', 'md', 'lg', 'xl'].includes(size);

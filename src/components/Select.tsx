@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { forwardRef, useState, Fragment } from 'react';
-import { usePopoverAnchor, usePressable, useTheme } from '../primitives';
+import { usePopoverAnchor, usePressable } from '../primitives';
 import { useCompose } from '../util';
 import { jsx } from '@emotion/core';
 import { DockPanel } from './DockPanel';
@@ -20,7 +20,12 @@ export const Select = forwardRef<HTMLInputElement, any>((props, ref) => {
       <Input {...extraInputProps} />
       {open && (
         <Portal>
-          <DockPanel popoverFullWidth anchorRef={extraInputProps.ref}>
+          <DockPanel
+            popoverFullWidth
+            padding={{ horizontal: 'lg', vertical: 'md' }}
+            popoverOffset="0, 5"
+            anchorRef={extraInputProps.ref}
+          >
             Options
           </DockPanel>
         </Portal>

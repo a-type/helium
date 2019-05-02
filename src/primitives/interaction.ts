@@ -1,23 +1,23 @@
 import { useContext, useEffect, useRef, useCallback, Ref } from 'react';
-import { combine, generateId } from '../util';
+import { useCombine, generateId } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
-import { KeyCode, ExtraProps } from '../types';
+import { KeyCode, BehaviorProps, BrandTheme } from '../types';
 
-export const defaultFocusCss = {
+export const defaultFocusCss = (theme: BrandTheme) => ({
   '&:focus': {
     outline: '0',
-    boxShadow: '0 0 0 2px var(--color-control-effect-strong)', // FIXME
+    boxShadow: `0 0 0 2px ${theme.color.control.effectStrong}`, // FIXME
   },
   transition: '0.2s ease box-shadow',
-};
+});
 
 export type FocusConfig = {
   id?: string;
   tabbable?: boolean;
   focusCss?: InterpolationWithTheme<any>;
   ref?: Ref<any> | null;
-} & ExtraProps;
+} & BehaviorProps;
 
 export const useFocus = ({
   id: providedId,
@@ -39,7 +39,7 @@ export const useFocus = ({
     return () => focusContext.unregister(id);
   }, [usedRef]);
 
-  return combine(
+  return useCombine(
     {
       ref: usedRef,
       tabIndex: tabbable ? 0 : -1,
@@ -49,30 +49,13 @@ export const useFocus = ({
   );
 };
 
-const defaultPressableCss = {
-  cursor: 'pointer',
-};
-
-export type PressableConfig = {
-  id?: string;
-  tabbable?: boolean;
-  onPress?: () => void;
-  pressOnEnter?: boolean;
-  pressableCss?: InterpolationWithTheme<any>;
-} & ExtraProps;
-
-export const usePressable = ({
-  onPress: onPress,
-  id,
-  tabbable = true,
-  pressOnEnter = false,
-  pressableCss = defaultPressableCss,
-  ...rest
-}: PressableConfig) => {
+export const useA11yPressHandlers = (
+  onPress?: () => void,
+  pressOnEnter?: boolean,
+) => {
   /**
    * referencing https://www.w3.org/TR/wai-aria-practices/examples/button/button.html
    */
-
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
       // The action button is activated by space on the keyup event, but the
@@ -85,7 +68,7 @@ export const usePressable = ({
         onPress && onPress();
       }
     },
-    [onPress],
+    [onPress, pressOnEnter],
   );
   const onKeyUp = useCallback(
     (event: KeyboardEvent) => {
@@ -97,7 +80,35 @@ export const usePressable = ({
     [onPress],
   );
 
-  return combine(
+  return {
+    onKeyUp,
+    onKeyDown,
+  };
+};
+
+const defaultPressableCss = {
+  cursor: 'pointer',
+};
+
+export type PressableConfig = {
+  id?: string;
+  tabbable?: boolean;
+  onPress?: () => void;
+  pressOnEnter?: boolean;
+  pressableCss?: InterpolationWithTheme<any>;
+} & BehaviorProps;
+
+export const usePressable = ({
+  onPress,
+  id,
+  tabbable = true,
+  pressOnEnter = false,
+  pressableCss = defaultPressableCss,
+  ...rest
+}: PressableConfig) => {
+  const { onKeyDown, onKeyUp } = useA11yPressHandlers(onPress, pressOnEnter);
+
+  return useCombine(
     {
       onKeyDown,
       onKeyUp,

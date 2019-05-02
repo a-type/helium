@@ -89,7 +89,7 @@ const defaultBrandTheme: BrandTheme = {
 };
 
 export type ProviderProps = {
-  theme: BrandTheme;
+  theme?: BrandTheme;
 };
 
 export const Provider: FC<ProviderProps> = ({

@@ -5,6 +5,11 @@ export type ExtraProps = {
 };
 
 export type BehaviorProps = {
+  css?: InterpolationWithTheme<any> | InterpolationWithTheme<any>[];
+  className?: string;
+} & ExtraProps;
+
+export type AssignedProps = {
   css?: InterpolationWithTheme<any>;
   className?: string;
 } & ExtraProps;
@@ -28,6 +33,8 @@ export type BrandInteractiveColorConfig = BrandColorConfig & {
   effectWeak: string;
   effectStrong: string;
 };
+
+export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type BrandSizeConfig = {
   xs: string;

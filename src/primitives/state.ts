@@ -1,6 +1,7 @@
 import { createBehavior } from '../util';
 import { useCallback, ChangeEvent } from 'react';
 import { BehaviorProps } from '../types';
+import { useA11yPressHandlers } from './interaction';
 
 export type ValueConfig = {
   value: string;
@@ -21,3 +22,24 @@ export const useValue = createBehavior(({ value, onChange }: ValueConfig) => {
     onChange: handleChange,
   };
 });
+
+export type ToggleableConfig = {
+  toggled: boolean;
+  value?: string;
+  onChange: (toggleState: boolean, value: string | undefined) => void;
+} & BehaviorProps;
+
+export const useToggleable = createBehavior<ToggleableConfig>(
+  ({ toggled, value, onChange }) => {
+    const onPress = () => {
+      onChange && onChange(!toggled, value);
+    };
+    const handlers = useA11yPressHandlers(onPress);
+
+    return {
+      value,
+      checked: toggled,
+      ...handlers,
+    };
+  },
+);

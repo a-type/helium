@@ -4,54 +4,61 @@ import {
   usePressable,
   useFocus,
   useTextSize,
-  usePrimaryColors,
   TextSizeConfig,
   PressableConfig,
   FocusConfig,
+  useSpacing,
+  SpacingConfig,
+  useTheme,
+  useToggleable,
 } from '../primitives';
 import { useCompose } from '../util';
 import { jsx, InterpolationWithTheme } from '@emotion/core';
+import { BrandTheme, BehaviorProps } from '../types';
+import { ThemeProvider } from '../contexts';
 
-const defaultButtonCss = {
-  background: 'var(--color-control-bg)',
-  color: 'var(--color-control-fg)',
-  borderColor: 'var(--color-control-border)',
-  borderWidth: 'var(--border-width-normal)',
+const defaultButtonCss = (theme: BrandTheme) => ({
+  background: theme.color.control.bg,
+  color: theme.color.control.fg,
+  borderColor: theme.color.control.border,
+  borderWidth: theme.size.borderWidth.normal,
   borderStyle: 'solid',
-  paddingTop: 'var(--size-spacing-md)',
-  paddingBottom: 'var(--size-spacing-md)',
-  paddingLeft: 'var(--size-spacing-lg)',
-  paddingRight: 'var(--size-spacing-lg)',
-};
+});
+
+const defaultButtonPrimaryCss = (theme: BrandTheme) => ({
+  background: theme.color.control.primary.bg,
+  color: theme.color.control.primary.fg,
+  borderColor: theme.color.control.primary.border,
+});
 
 export type ButtonProps = PressableConfig &
   FocusConfig &
-  TextSizeConfig & {
+  TextSizeConfig &
+  SpacingConfig & {
     children: ReactNode;
     label?: string;
     primary?: boolean;
-    buttonCss?: InterpolationWithTheme<any>;
-  };
-
-const useButton = (props: ButtonProps) =>
-  useCompose<ButtonProps>(props, [
-    usePressable,
-    useFocus,
-    useTextSize,
-    [usePrimaryColors, !props.primary],
-  ]);
+  } & BehaviorProps;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { pressOnEnter = true, css, buttonCss = defaultButtonCss, ...props },
-    ref,
-  ) => {
-    const buttonProps = useButton({
-      pressOnEnter,
-      css: [buttonCss, css].filter(Boolean),
-      ref,
-      ...props,
-    });
+  ({ pressOnEnter = true, css, primary, ...props }, ref) => {
+    const buttonProps = useCompose<ButtonProps>(
+      {
+        pressOnEnter,
+        css: Array<InterpolationWithTheme<any>>()
+          .concat(defaultButtonCss)
+          .concat(primary ? defaultButtonPrimaryCss : null)
+          .concat(css)
+          .filter(Boolean),
+        padding: {
+          vertical: 'md',
+          horizontal: 'lg',
+        },
+        ref,
+        ...props,
+      },
+      [usePressable, useFocus, useTextSize, useSpacing],
+    );
 
     return <button {...buttonProps} />;
   },
@@ -60,23 +67,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 export type ToggleButtonConfig = ButtonProps & {
   toggled: boolean;
   onChange: (toggleState: boolean) => void;
+  value?: string;
 };
 
 export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonConfig>(
-  ({ onPress: onPressed, onChange, toggled, ...rest }, ref) => {
-    const combinedOnPressed = useCallback(() => {
-      const isToggled = !toggled;
-      onChange && onChange(isToggled);
-      onPressed && onPressed();
-    }, [onPressed, onChange, toggled]);
+  ({ onPress, onChange, toggled, value, css, ...rest }, ref) => {
+    const toggleProps = useToggleable({ toggled, onChange, value });
 
-    const buttonProps = useButton({
-      ...rest,
-      onPress: combinedOnPressed,
-      ref,
-      'aria-pressed': toggled,
-    });
-
-    return <button {...buttonProps} />;
+    return (
+      <Button
+        {...rest}
+        css={css as any}
+        {...toggleProps}
+        ref={ref}
+        aria-pressed={toggled}
+      />
+    );
   },
 );

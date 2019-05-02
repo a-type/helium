@@ -1,11 +1,11 @@
-import { BehaviorProps, ExtraProps } from '../types';
+import { BehaviorProps } from '../types';
 import { createBehavior } from '../util';
 
 export type FlexLayoutConfig = {
   direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
   align?: 'start' | 'end' | 'center' | 'stretch' | 'space-between';
   justify?: 'start' | 'end' | 'center' | 'stretch' | 'space-between';
-} & ExtraProps;
+} & BehaviorProps;
 
 export const useFlexLayout = createBehavior(
   ({
@@ -29,7 +29,7 @@ export type GridLayoutConfig = {
   rows?: string[];
   columns?: string[];
   gap?: string | [string, string];
-} & ExtraProps;
+} & BehaviorProps;
 
 const isTwoDimensionalArray = <T>(array: T[][] | T[]): array is T[][] =>
   array[0] instanceof Array;

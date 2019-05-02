@@ -1,13 +1,14 @@
 import { createBehavior } from '../util';
+import { Size, BrandTheme, BehaviorProps } from '../types';
 
 export type TextSizeConfig = {
-  textSize?: string;
-};
+  textSize?: Size;
+} & BehaviorProps;
 
 export const useTextSize = createBehavior(
-  ({ textSize = 'var(--size-text-md)' }: TextSizeConfig) => ({
-    css: {
-      fontSize: textSize,
-    },
+  ({ textSize = 'md' }: TextSizeConfig) => ({
+    css: (theme: BrandTheme) => ({
+      fontSize: theme.size.text[textSize],
+    }),
   }),
 );

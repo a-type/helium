@@ -24,7 +24,7 @@ export type DockPanelProps = SpacingConfig &
 export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>(
   (
     {
-      padding = 'var(--size-spacing-md)',
+      padding = 'md',
       popoverPlacement = 'bottom-start',
       depth = 1,
       border = true,

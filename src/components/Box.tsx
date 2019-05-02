@@ -6,7 +6,6 @@ import {
   useSizing,
   useSpacing,
   useFlexLayout,
-  GridLayoutConfig,
 } from '../primitives';
 import { forwardRef } from 'react';
 import { useCompose } from '../util';
