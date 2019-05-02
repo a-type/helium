@@ -5,7 +5,7 @@ import {
   Size,
   AssignedProps,
 } from './types';
-import { useMemo, useContext } from 'react';
+import { useMemo, useContext, Ref, useRef } from 'react';
 import { ArrayInterpolation } from '@emotion/css';
 import { InterpolationWithTheme, ThemeContext } from '@emotion/core';
 
@@ -131,3 +131,10 @@ export const createBehavior = <BehaviorConfig extends BehaviorProps>(
 
 export const isSize = (size: string | undefined): size is Size =>
   !!size && ['xs', 'sm', 'md', 'lg', 'xl'].includes(size);
+
+export const useRefOrProvided = <T extends any>(
+  providedRef: Ref<T> | null | undefined,
+): Ref<T> => {
+  const internalRef = useRef<T>(null);
+  return providedRef || internalRef;
+};

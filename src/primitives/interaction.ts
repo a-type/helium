@@ -1,8 +1,14 @@
 import { useContext, useEffect, useRef, useCallback, Ref } from 'react';
-import { useCombine, generateId } from '../util';
+import {
+  useCombine,
+  generateId,
+  createBehavior,
+  useRefOrProvided,
+} from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
 import { KeyCode, BehaviorProps, BrandTheme } from '../types';
+import { KeyboardContext } from '../contexts/keyboard';
 
 export const defaultFocusCss = (theme: BrandTheme) => ({
   '&:focus': {
@@ -106,3 +112,38 @@ export const usePressable = ({
     css: pressableCss,
   };
 };
+
+export type KeyboardNavigableConfig = {
+  id?: string;
+  ref?: Ref<HTMLElement>;
+} & BehaviorProps;
+
+export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
+  ({ id: providedId, ref }) => {
+    const usedRef = useRefOrProvided<HTMLElement>(ref);
+    const id = useRef<string>(providedId || generateId());
+    const keyboardContext = useContext(KeyboardContext);
+
+    useEffect(() => {
+      if (!keyboardContext) {
+        return;
+      }
+
+      console.log('register');
+
+      keyboardContext.registerElement(id.current, usedRef);
+      return () => {
+        if (keyboardContext) {
+          keyboardContext.unregisterElement(id.current);
+        }
+      };
+    }, [keyboardContext, id.current]);
+
+    return {
+      id: id.current,
+      ref: usedRef,
+      onKeyDown: keyboardContext && keyboardContext.onKeyDown,
+      onKeyUp: keyboardContext && keyboardContext.onKeyUp,
+    };
+  },
+);
