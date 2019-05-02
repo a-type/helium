@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { configure, addDecorator } from '@storybook/react';
-import { useTheme } from '../src/behaviors/theme';
-import { BrandTheme } from '../src/types';
+import { useTheme } from '../src/primitives';
 
 // automatically import all files ending in *.stories.js
 const req = require.context('../src', true, /\.stories\.tsx?$/);

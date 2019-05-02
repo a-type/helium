@@ -4,11 +4,12 @@ import React, {
   RefObject,
   useState,
   useCallback,
+  Ref,
 } from 'react';
 
 export type FocusContextValue = {
   groupName: string | null;
-  register(elementId: string, elementRef: RefObject<HTMLElement>): void;
+  register(elementId: string, elementRef: Ref<HTMLElement> | null): void;
   unregister(elementId: string): void;
   focus(elementId: string): void;
 };
@@ -29,11 +30,15 @@ export const FocusProvider: FC<FocusProviderProps> = ({
   ...rest
 }) => {
   const [elements, setElements] = useState<{
-    [name: string]: RefObject<HTMLElement>;
+    [name: string]: RefObject<HTMLElement> | null;
   }>({});
 
   const register = useCallback(
-    (elementId: string, elementRef: RefObject<HTMLElement>) => {
+    (elementId: string, elementRef: Ref<HTMLElement>) => {
+      if (typeof elementRef === 'function' || typeof elementRef === 'string') {
+        throw new Error('Only object refs are supported');
+      }
+
       setElements({
         ...elements,
         [elementId]: elementRef,

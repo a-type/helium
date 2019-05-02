@@ -1,6 +1,6 @@
-import { BrandTheme, ExtraProps, BrandThemeOverrides } from '../types';
-import defaults from 'lodash.defaultsdeep';
-import { createBehavior } from '../util';
+import React, { FC } from 'react';
+import * as Contexts from './contexts';
+import { BrandTheme } from './types';
 
 const defaultBrandTheme: BrandTheme = {
   color: {
@@ -88,25 +88,15 @@ const defaultBrandTheme: BrandTheme = {
   },
 };
 
-const convertBrandToVariables = (
-  brand: { [key: string]: any },
-  prefix: string = '-',
-): { [name: string]: string } => {
-  return Object.keys(brand).reduce<{ [name: string]: string }>((vars, key) => {
-    const value = brand[key];
-    const prefixedKey = `${prefix}-${key}`;
-    if (typeof value === 'object') {
-      return { ...vars, ...convertBrandToVariables(value, prefixedKey) };
-    }
-
-    return { ...vars, [prefixedKey]: value };
-  }, {});
+export type ProviderProps = {
+  theme: BrandTheme;
 };
 
-export type ThemeConfig = {
-  theme: BrandThemeOverrides;
-} & ExtraProps;
-
-export const useTheme = createBehavior(({ theme }: ThemeConfig) => ({
-  css: convertBrandToVariables(defaults(theme, defaultBrandTheme)),
-}));
+export const Provider: FC<ProviderProps> = ({
+  theme = defaultBrandTheme,
+  children,
+}) => (
+  <Contexts.ThemeProvider theme={theme}>
+    <Contexts.FocusProvider>{children}</Contexts.FocusProvider>
+  </Contexts.ThemeProvider>
+);

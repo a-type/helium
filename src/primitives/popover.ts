@@ -32,6 +32,8 @@ export type PopoverConfig = {
   popoverFlip?: boolean;
   popoverInner?: boolean;
   popoverFast?: boolean;
+  popoverFullWidth?: boolean;
+  popoverFullHeight?: boolean;
 } & BehaviorProps;
 
 const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
@@ -56,6 +58,21 @@ const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
       inner: {
         enabled: props.popoverInner,
       },
+      matchSize: {
+        enabled: props.popoverFullHeight || props.popoverFullWidth,
+        fn: data => {
+          if (props.popoverFullWidth) {
+            data.offsets.popper.width = data.offsets.reference.width;
+            data.styles.width = '' + data.offsets.popper.width + 'px';
+          }
+          if (props.popoverFullHeight) {
+            data.offsets.popper.height = data.offsets.reference.height;
+            data.styles.height = '' + data.offsets.popper.height + 'px';
+          }
+          return data;
+        },
+        order: 840,
+      },
     },
   };
 
@@ -69,6 +86,10 @@ const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
  */
 export const usePopover = createBehavior((props: PopoverConfig) => {
   const { anchorRef, popoverFast: fast = true } = props;
+
+  if (!anchorRef) {
+    throw new Error('usePopover requires an anchorRef');
+  }
 
   const popoverRef = useRef<HTMLElement>(null);
   const popperInstanceRef = useRef<Popper | null>(null);
@@ -146,6 +167,7 @@ export const usePopover = createBehavior((props: PopoverConfig) => {
     style: {
       position: 'absolute',
       visibility: 'hidden',
+      boxSizing: 'border-box',
       ...(popperData && popperData.styles),
     },
   };

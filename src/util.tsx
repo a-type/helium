@@ -66,6 +66,7 @@ export const combine = (
       css: combineCss(finalProps.css, behaviorProp.css),
       className: combineClassName(finalProps.className, behaviorProp.className),
       ...combineEventHandlers(finalProps, behaviorProp),
+      ref: finalProps.ref || behaviorProp.ref,
     };
   }, {});
 
