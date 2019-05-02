@@ -12,7 +12,6 @@ export const useFlexLayout = createBehavior(
     direction = 'column',
     align = 'start',
     justify = 'start',
-    ...rest
   }: FlexLayoutConfig = {}): BehaviorProps => ({
     css: {
       display: 'flex',
@@ -20,7 +19,6 @@ export const useFlexLayout = createBehavior(
       alignItems: align,
       justifyContent: justify,
     },
-    ...rest,
   }),
 );
 
@@ -40,7 +38,6 @@ export const useGridLayout = createBehavior(
     rows = [],
     columns = [],
     gap = '0',
-    ...rest
   }: GridLayoutConfig = {}): BehaviorProps => {
     const normalizedAreas: string[][] = isTwoDimensionalArray(areas)
       ? areas
@@ -59,7 +56,6 @@ export const useGridLayout = createBehavior(
         gridTemplateColumns: columns.join(' '),
         gap: gapString,
       },
-      ...rest,
     };
   },
 );

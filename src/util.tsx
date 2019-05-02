@@ -112,7 +112,7 @@ export const useCompose = <Props extends ExtraProps>(
       return behavior(props);
     }
   });
-  return useCombine(...behaviorProps);
+  return useCombine(props, ...behaviorProps);
 };
 
 export const generateId = (base?: string): string => {
@@ -126,8 +126,7 @@ export const createBehavior = <BehaviorConfig extends BehaviorProps>(
     return props;
   }
 
-  const result = implementation(props as BehaviorConfig);
-  return useCombine(result, props);
+  return implementation(props as BehaviorConfig);
 };
 
 export const isSize = (size: string | undefined): size is Size =>

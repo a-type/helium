@@ -24,7 +24,6 @@ export const useFocus = ({
   tabbable = true,
   focusCss = defaultFocusCss,
   ref,
-  ...rest
 }: FocusConfig) => {
   const id = providedId || generateId('focusable');
 
@@ -39,14 +38,11 @@ export const useFocus = ({
     return () => focusContext.unregister(id);
   }, [usedRef]);
 
-  return useCombine(
-    {
-      ref: usedRef,
-      tabIndex: tabbable ? 0 : -1,
-      css: focusCss,
-    },
-    rest,
-  );
+  return {
+    ref: usedRef,
+    tabIndex: tabbable ? 0 : -1,
+    css: focusCss,
+  };
 };
 
 export const useA11yPressHandlers = (
@@ -91,8 +87,6 @@ const defaultPressableCss = {
 };
 
 export type PressableConfig = {
-  id?: string;
-  tabbable?: boolean;
   onPress?: () => void;
   pressOnEnter?: boolean;
   pressableCss?: InterpolationWithTheme<any>;
@@ -100,21 +94,15 @@ export type PressableConfig = {
 
 export const usePressable = ({
   onPress,
-  id,
-  tabbable = true,
   pressOnEnter = false,
   pressableCss = defaultPressableCss,
-  ...rest
 }: PressableConfig) => {
   const { onKeyDown, onKeyUp } = useA11yPressHandlers(onPress, pressOnEnter);
 
-  return useCombine(
-    {
-      onKeyDown,
-      onKeyUp,
-      onClick: onPress,
-      css: pressableCss,
-    },
-    rest,
-  );
+  return {
+    onKeyDown,
+    onKeyUp,
+    onClick: onPress,
+    css: pressableCss,
+  };
 };

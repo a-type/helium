@@ -89,9 +89,8 @@ const parseSpacing = (
 };
 
 export const useSpacing = createBehavior(
-  ({ margin, padding, ...rest }: SpacingConfig = {}): BehaviorProps => {
+  ({ margin, padding }: SpacingConfig = {}): BehaviorProps => {
     return {
-      ...rest,
       css: theme => ({
         ...parseSpacing(margin, 'margin', theme),
         ...parseSpacing(padding, 'padding', theme),
