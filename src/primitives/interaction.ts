@@ -8,7 +8,7 @@ import {
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
 import { KeyCode, BehaviorProps, BrandTheme } from '../types';
-import { KeyboardContext } from '../contexts/keyboard';
+import { KeyboardGroupContext } from '../contexts/keyboard';
 
 export const defaultFocusCss = (theme: BrandTheme) => ({
   '&:focus': {
@@ -122,14 +122,12 @@ export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
   ({ id: providedId, ref }) => {
     const usedRef = useRefOrProvided<HTMLElement>(ref);
     const id = useRef<string>(providedId || generateId());
-    const keyboardContext = useContext(KeyboardContext);
+    const keyboardContext = useContext(KeyboardGroupContext);
 
     useEffect(() => {
       if (!keyboardContext) {
         return;
       }
-
-      console.log('register');
 
       keyboardContext.registerElement(id.current, usedRef);
       return () => {

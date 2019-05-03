@@ -116,7 +116,7 @@ export const useAll = <Props extends ExtraProps>(
 };
 
 export const generateId = (base?: string): string => {
-  return `${base || ''}-${Math.floor(Math.random() * 100000000)}`;
+  return `${base || 'generated'}-${Math.floor(Math.random() * 100000000)}`;
 };
 
 export const createBehavior = <BehaviorConfig extends BehaviorProps>(
@@ -137,4 +137,32 @@ export const useRefOrProvided = <T extends any>(
 ): Ref<T> => {
   const internalRef = useRef<T>(null);
   return providedRef || internalRef;
+};
+
+export const getNextIndex = (
+  currentIndex: number,
+  length: number,
+  wrap?: boolean,
+) => {
+  if (currentIndex + 1 < length) {
+    return currentIndex + 1;
+  }
+  if (!wrap) {
+    return length - 1;
+  }
+  return currentIndex + 1 - length;
+};
+
+export const getPreviousIndex = (
+  currentIndex: number,
+  length: number,
+  wrap?: boolean,
+) => {
+  if (currentIndex > 0) {
+    return currentIndex - 1;
+  }
+  if (!wrap) {
+    return 0;
+  }
+  return length + (currentIndex - 1);
 };
