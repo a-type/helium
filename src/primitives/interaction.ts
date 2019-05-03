@@ -1,11 +1,5 @@
 import { useContext, useEffect, useRef, useCallback, Ref } from 'react';
-import {
-  useCombine,
-  generateId,
-  createBehavior,
-  useRefOrProvided,
-  useIdOrGenerated,
-} from '../util';
+import { createBehavior, useRefOrProvided, useIdOrGenerated } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
 import { KeyCode, BehaviorProps, BrandTheme } from '../types';
@@ -32,7 +26,7 @@ export const useFocus = ({
   focusCss = defaultFocusCss,
   ref,
 }: FocusConfig) => {
-  const id = providedId || generateId('focusable');
+  const id = useIdOrGenerated(providedId, 'focusable');
 
   const focusContext = useContext(FocusContext);
   const elementRef = useRef<HTMLElement>(null);
@@ -122,7 +116,7 @@ export type KeyboardNavigableConfig = {
 export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
   ({ id: providedId, ref }) => {
     const usedRef = useRefOrProvided<HTMLElement>(ref);
-    const id = useIdOrGenerated(providedId);
+    const id = useIdOrGenerated(providedId, 'keyboardNavigable');
     const keyboardContext = useContext(KeyboardGroupContext);
 
     useEffect(() => {
@@ -143,6 +137,58 @@ export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
       ref: usedRef,
       onKeyDown: keyboardContext && keyboardContext.onKeyDown,
       onKeyUp: keyboardContext && keyboardContext.onKeyUp,
+    };
+  },
+);
+
+export type EscapableConfig = {
+  id?: string;
+  ref?: Ref<HTMLElement>;
+  onEscape(): void;
+} & BehaviorProps;
+
+export const useEscapable = createBehavior<EscapableConfig>(
+  ({ id: providedId, ref, onEscape }) => {
+    const usedRef = useRefOrProvided<HTMLElement>(ref);
+    const id = useIdOrGenerated(providedId, 'escapable');
+
+    if (typeof usedRef === 'function') {
+      throw new Error('Function refs are not compatible with useEscapable');
+    }
+
+    const handleKeyDown = useCallback(
+      (ev: KeyboardEvent) => {
+        if (ev.keyCode === KeyCode.Escape) {
+          ev.preventDefault();
+          onEscape();
+        }
+      },
+      [onEscape],
+    );
+
+    useEffect(() => {
+      const handleMouseDown = (ev: MouseEvent) => {
+        if (
+          usedRef &&
+          usedRef.current &&
+          usedRef.current.contains(ev.target as Node)
+        ) {
+          return;
+        }
+
+        onEscape();
+      };
+
+      document.addEventListener('mousedown', handleMouseDown);
+      return () => {
+        document.removeEventListener('mousedown', handleMouseDown);
+      };
+    }, [usedRef && usedRef.current, onEscape]);
+
+    return {
+      id,
+      ref: usedRef,
+      onKeyDown: handleKeyDown,
     };
   },
 );

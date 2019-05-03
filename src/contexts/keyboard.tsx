@@ -8,12 +8,7 @@ import React, {
   useEffect,
 } from 'react';
 import { KeyCode } from '../types';
-import {
-  generateId,
-  getNextIndex,
-  getPreviousIndex,
-  useIdOrGenerated,
-} from '../util';
+import { getNextIndex, getPreviousIndex, useIdOrGenerated } from '../util';
 
 export type KeyboardContextParentView = {
   focusIndex(index: number): void;

@@ -8,8 +8,9 @@ import {
   useText,
   useFocus,
   useSizing,
+  useEscapable,
 } from '../primitives';
-import { useAll, toString } from '../util';
+import { useAll, toString, useRefOrProvided } from '../util';
 import { KeyboardGroupProvider } from '../contexts/keyboard';
 import { Box, BoxProps } from './Box';
 
@@ -68,7 +69,15 @@ export const OptionsList = <T extends any = any>({
   selectedIndex: providedSelectedIndex,
   ...rest
 }: OptionsListProps<T>) => {
-  const focusProps = useFocus({ id, ref: rest.ref });
+  const onEscape = () => {
+    console.info('Escaped');
+  };
+
+  // because useAll doesn't compose, we need to define a ref here...
+  // FIXME?
+  const ref = useRefOrProvided(rest.ref);
+
+  const behaviorProps = useAll({ id, ref, onEscape }, [useFocus, useEscapable]);
 
   const selectedIndex =
     providedSelectedIndex ||
@@ -83,7 +92,7 @@ export const OptionsList = <T extends any = any>({
         aria-activedescendant={selectedId}
         role="listbox"
         {...rest}
-        {...focusProps}
+        {...behaviorProps}
       >
         {options.map((option, index) => (
           <OptionsListItem
