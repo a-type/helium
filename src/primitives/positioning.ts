@@ -102,13 +102,19 @@ export const useSpacing = createBehavior(
 export type SizingConfig = {
   width?: string;
   height?: string;
+  boxSizing?: 'border-box' | 'content-box';
 } & BehaviorProps;
 
 export const useSizing = createBehavior(
-  ({ width = 'auto', height = 'auto' }: SizingConfig): BehaviorProps => ({
+  ({
+    width = 'auto',
+    height = 'auto',
+    boxSizing = 'border-box',
+  }: SizingConfig): BehaviorProps => ({
     css: {
       width,
       height,
+      boxSizing,
     },
   }),
 );

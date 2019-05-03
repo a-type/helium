@@ -2,10 +2,10 @@
 import {
   ValueConfig,
   FocusConfig,
-  TextSizeConfig,
+  TextConfig,
   useFocus,
   useValue,
-  useTextSize,
+  useText,
   useSpacing,
   SpacingConfig,
 } from '../primitives';
@@ -44,7 +44,7 @@ export type InputType =
 
 export type InputConfig = ValueConfig &
   FocusConfig &
-  TextSizeConfig &
+  TextConfig &
   SpacingConfig & {
     type?: InputType;
   };
@@ -61,7 +61,7 @@ export const Input = forwardRef<HTMLInputElement, InputConfig>((props, ref) => {
       },
       ref,
     },
-    [useFocus, useValue, useTextSize, useSpacing],
+    [useFocus, useValue, useText, useSpacing],
   );
 
   return <input {...inputProps} />;

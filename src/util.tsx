@@ -166,3 +166,6 @@ export const getPreviousIndex = (
   }
   return length + (currentIndex - 1);
 };
+
+export const toString = (any: any): string =>
+  '' + (any.toString() ? any.toString() : any);

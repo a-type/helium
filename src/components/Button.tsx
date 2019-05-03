@@ -3,8 +3,8 @@ import { forwardRef, ReactNode, useCallback } from 'react';
 import {
   usePressable,
   useFocus,
-  useTextSize,
-  TextSizeConfig,
+  useText,
+  TextConfig,
   PressableConfig,
   FocusConfig,
   useSpacing,
@@ -33,7 +33,7 @@ const defaultButtonPrimaryCss = (theme: BrandTheme) => ({
 
 export type ButtonProps = PressableConfig &
   FocusConfig &
-  TextSizeConfig &
+  TextConfig &
   SpacingConfig & {
     children: ReactNode;
     label?: string;
@@ -57,7 +57,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref,
         ...props,
       },
-      [usePressable, useFocus, useTextSize, useSpacing],
+      [usePressable, useFocus, useText, useSpacing],
     );
 
     return <button {...buttonProps} />;
