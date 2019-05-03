@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   Ref,
+  useContext,
 } from 'react';
 
 export type FocusContextValue = {
@@ -82,4 +83,10 @@ export const FocusProvider: FC<FocusProviderProps> = ({
       }}
     />
   );
+};
+
+export const useFocusElement = () => {
+  const focusContext = useContext(FocusContext);
+
+  return focusContext.focus;
 };

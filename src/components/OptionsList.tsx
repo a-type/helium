@@ -25,6 +25,8 @@ export type OptionsListProps<T> = HTMLAttributes<HTMLDivElement> &
     getOptionKey?: (option: T) => string;
     id?: string;
     onOptionSelected: (option: T) => void;
+    selectedOption?: T;
+    selectedIndex?: number;
   };
 
 export const defaultOptionsListRenderOption = toString;
@@ -62,15 +64,33 @@ export const OptionsList = <T extends any = any>({
   getOptionKey = defaultOptionsListGetOptionKey,
   id,
   onOptionSelected,
+  selectedOption,
+  selectedIndex: providedSelectedIndex,
   ...rest
 }: OptionsListProps<T>) => {
+  const focusProps = useFocus({ id, ref: rest.ref });
+
+  const selectedIndex =
+    providedSelectedIndex ||
+    (selectedOption ? options.indexOf(selectedOption) : -1);
+  const optionKeys = options.map(getOptionKey);
+  const selectedId = optionKeys[selectedIndex] || null;
+
   return (
     <KeyboardGroupProvider axis="vertical" groupId={id}>
-      <Box direction="column" {...rest}>
-        {options.map(option => (
+      <Box
+        direction="column"
+        aria-activedescendant={selectedId}
+        role="listbox"
+        {...rest}
+        {...focusProps}
+      >
+        {options.map((option, index) => (
           <OptionsListItem
-            key={getOptionKey(option)}
+            key={optionKeys[index]}
+            id={id + '_' + optionKeys[index]}
             onPress={() => onOptionSelected(option)}
+            aria-selected={index === selectedIndex}
           >
             {renderOption(option)}
           </OptionsListItem>

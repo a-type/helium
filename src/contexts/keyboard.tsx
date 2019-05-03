@@ -8,7 +8,12 @@ import React, {
   useEffect,
 } from 'react';
 import { KeyCode } from '../types';
-import { generateId, getNextIndex, getPreviousIndex } from '../util';
+import {
+  generateId,
+  getNextIndex,
+  getPreviousIndex,
+  useIdOrGenerated,
+} from '../util';
 
 export type KeyboardContextParentView = {
   focusIndex(index: number): void;
@@ -26,6 +31,7 @@ export type KeyboardGroupContextValue = {
   unregisterElement(elementId: string): void;
   onKeyDown(ev: KeyboardEvent): void;
   onKeyUp(ev: KeyboardEvent): void;
+  id: string;
 };
 
 export const KeyboardRootContext = createContext<KeyboardRootContextValue | null>(
@@ -36,6 +42,7 @@ export const KeyboardGroupContext = createContext<KeyboardGroupContextValue>({
   unregisterElement: () => {},
   onKeyDown: () => {},
   onKeyUp: () => {},
+  id: 'none',
 });
 
 export type KeyboardRootProviderProps = {
@@ -143,9 +150,7 @@ export const KeyboardGroupProvider: FC<KeyboardGroupProviderProps> = ({
   const previousSiblingKeyCode =
     axis === 'horizontal' ? KeyCode.ArrowUp : KeyCode.ArrowLeft;
 
-  const groupId = useRef<string>(
-    providedGroupId || generateId('keyboardGroup'),
-  );
+  const groupId = useIdOrGenerated(providedGroupId, 'keyboardGroup');
 
   const parent = useContext(KeyboardRootContext);
   const elementsRef = useRef<
@@ -205,10 +210,10 @@ export const KeyboardGroupProvider: FC<KeyboardGroupProviderProps> = ({
       }
       event.preventDefault();
     } else if (parent && event.keyCode === nextSiblingKeyCode) {
-      parent.goToNextGroup(groupId.current, idx);
+      parent.goToNextGroup(groupId, idx);
       event.preventDefault();
     } else if (parent && event.keyCode === previousSiblingKeyCode) {
-      parent.goToPreviousGroup(groupId.current, idx);
+      parent.goToPreviousGroup(groupId, idx);
       event.preventDefault();
     }
   };
@@ -256,11 +261,11 @@ export const KeyboardGroupProvider: FC<KeyboardGroupProviderProps> = ({
 
   useEffect(() => {
     if (parent) {
-      parent.registerKeyboardGroup(groupId.current, { focusIndex });
+      parent.registerKeyboardGroup(groupId, { focusIndex });
     }
 
     return () => {
-      if (parent) parent.unregisterKeyboardGroup(groupId.current);
+      if (parent) parent.unregisterKeyboardGroup(groupId);
     };
   }, [parent, groupId, focusIndex]);
 
@@ -269,6 +274,7 @@ export const KeyboardGroupProvider: FC<KeyboardGroupProviderProps> = ({
     unregisterElement,
     onKeyUp,
     onKeyDown,
+    id: groupId,
   };
 
   return (

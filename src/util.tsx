@@ -139,6 +139,18 @@ export const useRefOrProvided = <T extends any>(
   return providedRef || internalRef;
 };
 
+export const useIdOrGenerated = (
+  providedId?: string,
+  idBase?: string,
+): string => {
+  const generatedId = useRef<string>(generateId(idBase));
+  if (providedId) {
+    return providedId;
+  } else {
+    return generatedId.current;
+  }
+};
+
 export const getNextIndex = (
   currentIndex: number,
   length: number,

@@ -4,6 +4,7 @@ import {
   generateId,
   createBehavior,
   useRefOrProvided,
+  useIdOrGenerated,
 } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
@@ -121,7 +122,7 @@ export type KeyboardNavigableConfig = {
 export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
   ({ id: providedId, ref }) => {
     const usedRef = useRefOrProvided<HTMLElement>(ref);
-    const id = useRef<string>(providedId || generateId());
+    const id = useIdOrGenerated(providedId);
     const keyboardContext = useContext(KeyboardGroupContext);
 
     useEffect(() => {
@@ -129,16 +130,16 @@ export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
         return;
       }
 
-      keyboardContext.registerElement(id.current, usedRef);
+      keyboardContext.registerElement(id, usedRef);
       return () => {
         if (keyboardContext) {
-          keyboardContext.unregisterElement(id.current);
+          keyboardContext.unregisterElement(id);
         }
       };
-    }, [keyboardContext, id.current]);
+    }, [keyboardContext.id, id]);
 
     return {
-      id: id.current,
+      id: id,
       ref: usedRef,
       onKeyDown: keyboardContext && keyboardContext.onKeyDown,
       onKeyUp: keyboardContext && keyboardContext.onKeyUp,
