@@ -1,9 +1,12 @@
-import { useContext, useEffect, useRef, useCallback, Ref } from 'react';
+import { useContext, useEffect, useCallback, Ref } from 'react';
 import { createBehavior, useRefOrProvided, useIdOrGenerated } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
 import { KeyCode, BehaviorProps, BrandTheme } from '../types';
-import { KeyboardGroupContext } from '../contexts/keyboard';
+import {
+  SelectionElementContext,
+  SelectionGroupContext,
+} from '../contexts/selection';
 
 export const defaultFocusCss = (theme: BrandTheme) => ({
   '&:focus': {
@@ -13,34 +16,32 @@ export const defaultFocusCss = (theme: BrandTheme) => ({
   transition: '0.2s ease box-shadow',
 });
 
-export type FocusConfig = {
+export type FocusConfig<T extends HTMLElement> = {
   id?: string;
   tabbable?: boolean;
   focusCss?: InterpolationWithTheme<any>;
-  ref?: Ref<any> | null;
+  ref?: Ref<T> | null;
 } & BehaviorProps;
 
-export const useFocus = ({
+export const useFocus = <T extends HTMLElement>({
   id: providedId,
   tabbable = true,
   focusCss = defaultFocusCss,
-  ref,
-}: FocusConfig) => {
+  ref: providedRef,
+}: FocusConfig<T>) => {
   const id = useIdOrGenerated(providedId, 'focusable');
 
   const focusContext = useContext(FocusContext);
-  const elementRef = useRef<HTMLElement>(null);
-
-  // always use provided ref if it's there
-  const usedRef = ref || elementRef;
+  const ref = useRefOrProvided<T>(providedRef);
 
   useEffect(() => {
-    focusContext.register(id, usedRef);
+    focusContext.register(id, ref);
     return () => focusContext.unregister(id);
-  }, [usedRef]);
+  }, [ref]);
 
   return {
-    ref: usedRef,
+    id,
+    ref,
     tabIndex: tabbable ? 0 : -1,
     css: focusCss,
   };
@@ -108,23 +109,59 @@ export const usePressable = ({
   };
 };
 
-export type KeyboardNavigableConfig = {
+export type SelectableGroupConfig = {
   id?: string;
   ref?: Ref<HTMLElement>;
 } & BehaviorProps;
 
-export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
-  ({ id: providedId, ref }) => {
-    const usedRef = useRefOrProvided<HTMLElement>(ref);
-    const id = useIdOrGenerated(providedId, 'keyboardNavigable');
-    const keyboardContext = useContext(KeyboardGroupContext);
+export const useSelectableGroup = createBehavior<SelectableGroupConfig>(
+  ({ id: providedId, ref: providedRef }) => {
+    const id = useIdOrGenerated(providedId, 'selectableGroup');
+    const ref = useRefOrProvided(providedRef);
+    const keyboardContext = useContext(SelectionGroupContext);
+
+    useEffect(() => {
+      keyboardContext.registerGroupElement(ref);
+      return () => keyboardContext.registerGroupElement(null);
+    }, [ref]);
+
+    return {
+      id,
+      'aria-activedescendant': keyboardContext.selectedId,
+      onMouseDown: keyboardContext.onMouseDown,
+      onKeyDown: keyboardContext.onKeyDown,
+      onKeyUp: keyboardContext.onKeyUp,
+      tabIndex: 0,
+      ref,
+    };
+  },
+);
+
+export type SelectableItemConfig = {
+  id?: string;
+  selectableCss?: InterpolationWithTheme<BrandTheme>;
+} & BehaviorProps;
+
+const defaultSelectableCss = (theme: BrandTheme) => ({
+  userSelect: 'none',
+  cursor: 'pointer',
+  '&[aria-selected="true"]': {
+    background: theme.color.selection.bg,
+    color: theme.color.selection.fg,
+  },
+});
+
+export const useSelectableItem = createBehavior<SelectableItemConfig>(
+  ({ id: providedId, selectableCss = defaultSelectableCss }) => {
+    const id = useIdOrGenerated(providedId, 'selectableItem');
+    const keyboardContext = useContext(SelectionElementContext);
 
     useEffect(() => {
       if (!keyboardContext) {
         return;
       }
 
-      keyboardContext.registerElement(id, usedRef);
+      keyboardContext.registerElement(id);
       return () => {
         if (keyboardContext) {
           keyboardContext.unregisterElement(id);
@@ -134,9 +171,8 @@ export const useKeyboardNavigable = createBehavior<KeyboardNavigableConfig>(
 
     return {
       id: id,
-      ref: usedRef,
-      onKeyDown: keyboardContext && keyboardContext.onKeyDown,
-      onKeyUp: keyboardContext && keyboardContext.onKeyUp,
+      'aria-selected': keyboardContext && id === keyboardContext.selectedId,
+      css: selectableCss,
     };
   },
 );
@@ -145,20 +181,26 @@ export type EscapableConfig = {
   id?: string;
   ref?: Ref<HTMLElement>;
   onEscape(): void;
+  escapeKeys?: KeyCode[];
 } & BehaviorProps;
 
 export const useEscapable = createBehavior<EscapableConfig>(
-  ({ id: providedId, ref, onEscape }) => {
-    const usedRef = useRefOrProvided<HTMLElement>(ref);
+  ({
+    id: providedId,
+    ref: providedRef,
+    onEscape,
+    escapeKeys = [KeyCode.Escape],
+  }) => {
+    const ref = useRefOrProvided<HTMLElement>(providedRef);
     const id = useIdOrGenerated(providedId, 'escapable');
 
-    if (typeof usedRef === 'function') {
+    if (typeof ref === 'function') {
       throw new Error('Function refs are not compatible with useEscapable');
     }
 
     const handleKeyDown = useCallback(
       (ev: KeyboardEvent) => {
-        if (ev.keyCode === KeyCode.Escape) {
+        if (escapeKeys.includes(ev.keyCode)) {
           ev.preventDefault();
           onEscape();
         }
@@ -168,11 +210,7 @@ export const useEscapable = createBehavior<EscapableConfig>(
 
     useEffect(() => {
       const handleMouseDown = (ev: MouseEvent) => {
-        if (
-          usedRef &&
-          usedRef.current &&
-          usedRef.current.contains(ev.target as Node)
-        ) {
+        if (ref && ref.current && ref.current.contains(ev.target as Node)) {
           return;
         }
 
@@ -183,11 +221,11 @@ export const useEscapable = createBehavior<EscapableConfig>(
       return () => {
         document.removeEventListener('mousedown', handleMouseDown);
       };
-    }, [usedRef && usedRef.current, onEscape]);
+    }, [ref && ref.current, onEscape]);
 
     return {
       id,
-      ref: usedRef,
+      ref: ref,
       onKeyDown: handleKeyDown,
     };
   },

@@ -8,6 +8,7 @@ import {
 import { useMemo, useContext, Ref, useRef } from 'react';
 import { ArrayInterpolation } from '@emotion/css';
 import { InterpolationWithTheme, ThemeContext } from '@emotion/core';
+import cleanProps from 'clean-react-props';
 
 export const castCssArray = (
   cssOrList:
@@ -112,7 +113,10 @@ export const useAll = <Props extends ExtraProps>(
       return behavior(props);
     }
   });
-  return useCombine(props, ...behaviorProps);
+
+  const combined = useCombine(props, ...behaviorProps);
+
+  return cleanProps(combined, [], ['ref', 'css', 'children']);
 };
 
 export const generateId = (base?: string): string => {

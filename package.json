@@ -25,6 +25,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "@ramda/pathor": "^0.26.1",
+    "clean-react-props": "^0.2.13",
     "emotion-theming": "^10.0.10",
     "lodash.defaultsdeep": "^4.6.0",
     "popper.js": "^1.15.0",

@@ -2,10 +2,10 @@ import React, {
   createContext,
   FC,
   RefObject,
-  useState,
   useCallback,
   Ref,
   useContext,
+  useRef,
 } from 'react';
 
 export type FocusContextValue = {
@@ -30,7 +30,7 @@ export const FocusProvider: FC<FocusProviderProps> = ({
   groupName,
   ...rest
 }) => {
-  const [elements, setElements] = useState<{
+  const elementsRef = useRef<{
     [name: string]: RefObject<HTMLElement> | null;
   }>({});
 
@@ -40,26 +40,27 @@ export const FocusProvider: FC<FocusProviderProps> = ({
         throw new Error('Only object refs are supported');
       }
 
-      setElements({
-        ...elements,
+      elementsRef.current = {
+        ...elementsRef.current,
         [elementId]: elementRef,
-      });
+      };
     },
-    [elements, setElements],
+    [elementsRef],
   );
 
   const unregister = useCallback(
     (elementId: string) => {
-      delete elements[elementId];
-      setElements(elements);
+      delete elementsRef.current[elementId];
     },
-    [elements, setElements],
+    [elementsRef],
   );
 
   const focus = useCallback(
     (elementId: string) => {
-      const elementRef = elements[elementId];
+      const elementRef = elementsRef.current[elementId];
+      console.log(elementRef);
       if (elementRef && elementRef.current) {
+        console.debug('imperatively focusing ', elementRef.current);
         elementRef.current.focus();
       } else {
         console.debug(
@@ -69,7 +70,7 @@ export const FocusProvider: FC<FocusProviderProps> = ({
         );
       }
     },
-    [elements],
+    [elementsRef],
   );
 
   return (
@@ -85,7 +86,7 @@ export const FocusProvider: FC<FocusProviderProps> = ({
   );
 };
 
-export const useFocusElement = () => {
+export const useImperativeFocus = () => {
   const focusContext = useContext(FocusContext);
 
   return focusContext.focus;

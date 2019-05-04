@@ -1,13 +1,19 @@
 /**@jsx jsx */
 import { forwardRef, useState, Fragment } from 'react';
-import { usePopoverAnchor, usePressable } from '../primitives';
+import {
+  usePopoverAnchor,
+  usePressable,
+  PopoverAnchorConfig,
+  PressableConfig,
+} from '../primitives';
 import { useAll, useIdOrGenerated } from '../util';
 import { jsx } from '@emotion/core';
 import { DockPanel } from './DockPanel';
 import { Input } from './Input';
 import { Portal } from 'react-portal';
 import OptionsList from './OptionsList';
-import { useFocusElement } from '../contexts';
+import { useImperativeFocus } from '../contexts';
+import { KeyCode } from '../types';
 
 export type SelectProps<T> = {
   options: T[];
@@ -22,22 +28,35 @@ export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
     const optionsId = id + '_options';
     const [open, setOpen] = useState(false);
 
-    const focusElement = useFocusElement();
+    const imperativelyFocus = useImperativeFocus();
+
+    const showOptions = () => setOpen(true);
 
     const handleOpen = () => {
-      setOpen(true);
-      // imperatively focus the options list
-      focusElement(optionsId);
+      imperativelyFocus(optionsId);
     };
 
-    const extraInputProps = useAll({ ...props, ref, onPress: handleOpen, id }, [
-      usePopoverAnchor,
-      usePressable,
-    ]);
+    const handleClose = () => {
+      setOpen(false);
+      imperativelyFocus(id);
+    };
+
+    const extraInputProps = useAll<PopoverAnchorConfig & PressableConfig>(
+      {
+        ...props,
+        ref,
+        onPress: showOptions,
+        id,
+        pressOnEnter: true,
+      },
+      [usePopoverAnchor, usePressable],
+    );
+
+    const options = props.options || [];
 
     return (
       <Fragment>
-        <Input {...extraInputProps} />
+        <Input {...props} {...extraInputProps} />
         {open && (
           <Portal>
             <DockPanel
@@ -45,12 +64,16 @@ export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
               popoverOffset="0, 5"
               padding="0"
               anchorRef={extraInputProps.ref}
+              onEscape={handleClose}
+              escapeKeys={[KeyCode.Escape, KeyCode.Enter]}
+              onOpen={handleOpen}
             >
               <OptionsList
                 id={optionsId}
                 onOptionSelected={props.onChange}
-                options={props.options || []}
+                options={options}
                 width="100%"
+                selectedIndex={options.indexOf(props.value)}
               />
             </DockPanel>
           </Portal>

@@ -11,15 +11,20 @@ import {
   useFlexLayout,
   useContentArea,
   ContentAreaConfig,
+  useEscapable,
+  EscapableConfig,
 } from '../primitives';
-import { useAll } from '../util';
-import { forwardRef } from 'react';
+import { useAll, useRefOrProvided } from '../util';
+import { forwardRef, useEffect } from 'react';
 
 export type DockPanelProps = SpacingConfig &
   ContentAreaConfig &
   FlexLayoutConfig &
   PopoverConfig &
-  DepthConfig;
+  DepthConfig &
+  EscapableConfig & {
+    onOpen?(): void;
+  };
 
 export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>(
   (
@@ -28,14 +33,37 @@ export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>(
       popoverPlacement = 'bottom-start',
       depth = 1,
       border = true,
+      onOpen,
       ...props
     },
-    ref,
+    providedRef,
   ) => {
+    // because useAll doesn't compose, we need to define a ref here...
+    // FIXME?
+    const ref = useRefOrProvided(providedRef);
+
     const dockPanelProps = useAll(
-      { ...props, padding, depth, border, popoverPlacement, ref },
-      [usePopover, useSpacing, useContentArea, useDepth, useFlexLayout],
+      {
+        ...props,
+        padding,
+        depth,
+        border,
+        popoverPlacement,
+        ref,
+      },
+      [
+        usePopover,
+        useSpacing,
+        useContentArea,
+        useDepth,
+        useFlexLayout,
+        useEscapable,
+      ],
     );
+
+    useEffect(() => {
+      onOpen && onOpen();
+    }, []);
 
     return <div {...dockPanelProps} />;
   },

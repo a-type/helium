@@ -37,6 +37,13 @@ const defaultBrandTheme: BrandTheme = {
       effectStrong: '#00000080',
       effectWeak: '#00000020',
     },
+    selection: {
+      bg: '#00000040',
+      fg: 'black',
+      border: '0',
+      effectStrong: '#00000080',
+      effectWeak: '#00000020',
+    },
   },
   font: {
     family: {

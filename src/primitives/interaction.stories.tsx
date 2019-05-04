@@ -2,55 +2,88 @@
 import { storiesOf } from '@storybook/react';
 import { jsx } from '@emotion/core';
 import {
-  KeyboardRootProvider,
-  KeyboardGroupProvider,
-} from '../contexts/keyboard';
+  SelectionRootProvider,
+  SelectionGroupProvider,
+} from '../contexts/selection';
 import { Button } from '../components';
-import { useKeyboardNavigable } from './interaction';
+import { useSelectableItem, useSelectableGroup } from './interaction';
 import { withKnobs, boolean } from '@storybook/addon-knobs';
+import { useState } from 'react';
+import { useAll } from '../util';
+import { useText } from './text';
+import { useSpacing } from './positioning';
+import { useContentArea } from './styling';
 
-const KeyboardNavigableButton = ({ idx }: { idx: number }) => {
-  const keyboardNavigableProps = useKeyboardNavigable({});
+const SelectableItem = ({ idx }: { idx: number }) => {
+  const selectableProps = useAll(
+    {
+      padding: 'md',
+    },
+    [useSelectableItem, useText, useSpacing, useContentArea],
+  );
   return (
-    <Button {...keyboardNavigableProps} margin="4px">
+    <li {...selectableProps} margin="4px">
       Button {idx}
-    </Button>
+    </li>
   );
 };
 
-const KeyboardNavigableDemo = ({ vertical = false }: { vertical: boolean }) => {
+const SelectableGroup = ({ vertical = false }: { vertical: boolean }) => {
+  const selectableGroupProps = useSelectableGroup({});
+
   return (
-    <div css={{ display: 'flex', flexDirection: vertical ? 'column' : 'row' }}>
-      <KeyboardGroupProvider axis={vertical ? 'vertical' : 'horizontal'}>
-        <KeyboardNavigableButton idx={0} />
-        <KeyboardNavigableButton idx={1} />
-        <KeyboardNavigableButton idx={2} />
-        <KeyboardNavigableButton idx={3} />
-      </KeyboardGroupProvider>
-    </div>
+    <ul
+      {...selectableGroupProps}
+      css={{
+        display: 'flex',
+        flexDirection: vertical ? 'column' : 'row',
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
+      }}
+    >
+      <SelectableItem idx={0} />
+      <SelectableItem idx={1} />
+      <SelectableItem idx={2} />
+      <SelectableItem idx={3} />
+    </ul>
   );
 };
 
-const KeyboardNavigableGridDemo = () => {
-  const grid = boolean('Grid', false);
+const SelectableDemo = ({ vertical = false }: { vertical: boolean }) => {
+  const [selected, setSelected] = useState(-1);
+
+  return (
+    <SelectionGroupProvider
+      axis={vertical ? 'vertical' : 'horizontal'}
+      selectedIndex={selected}
+      onSelectionChanged={({ index }) => setSelected(index)}
+    >
+      <SelectableGroup vertical={vertical} />
+    </SelectionGroupProvider>
+  );
+};
+
+const SelectableGridDemo = () => {
+  const grid = boolean('Grid', true);
   const columns = boolean('Column-based', false);
 
   return (
     <div css={{ display: 'flex', flexDirection: columns ? 'row' : 'column' }}>
-      <KeyboardRootProvider grid={grid}>
+      <SelectionRootProvider grid={grid}>
         <div>
-          <KeyboardNavigableDemo vertical={columns} />
+          <SelectableDemo vertical={columns} />
         </div>
         <div>
-          <KeyboardNavigableDemo vertical={columns} />
+          <SelectableDemo vertical={columns} />
         </div>
-      </KeyboardRootProvider>
+      </SelectionRootProvider>
     </div>
   );
 };
 
-storiesOf('primitives/useKeyboardNavigable', module)
+storiesOf('primitives/useSelectableGroup,useSelectableItem', module)
   .addDecorator(withKnobs)
-  .add('row demo', () => <KeyboardNavigableDemo vertical={false} />)
-  .add('column demo', () => <KeyboardNavigableDemo vertical />)
-  .add('2-direction demo', () => <KeyboardNavigableGridDemo />);
+  .add('row demo', () => <SelectableDemo vertical={false} />)
+  .add('column demo', () => <SelectableDemo vertical />)
+  .add('2-direction demo', () => <SelectableGridDemo />);

@@ -59,6 +59,7 @@ export type BrandTheme = {
       minimal: BrandInteractiveColorConfig;
     };
     field: BrandInteractiveColorConfig;
+    selection: BrandInteractiveColorConfig;
   };
   size: {
     text: BrandSizeConfig;

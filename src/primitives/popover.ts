@@ -1,6 +1,13 @@
 import { BehaviorProps } from '../types';
-import { createBehavior } from '../util';
-import { useRef, RefObject, useState, useMemo, useLayoutEffect } from 'react';
+import { createBehavior, useRefOrProvided } from '../util';
+import {
+  useRef,
+  RefObject,
+  useState,
+  useMemo,
+  useLayoutEffect,
+  Ref,
+} from 'react';
 import Popper, { PopperOptions } from 'popper.js';
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -27,6 +34,7 @@ export type PopoverConfig = {
   popoverFast?: boolean;
   popoverFullWidth?: boolean;
   popoverFullHeight?: boolean;
+  ref?: Ref<HTMLElement>;
 } & BehaviorProps;
 
 const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
@@ -78,13 +86,16 @@ const createBasePopperOptions = (props: PopoverConfig): Popper.PopperOptions =>
  * want your component to re-render when Popper positioning changes, set 'fast' to false.
  */
 export const usePopover = createBehavior((props: PopoverConfig) => {
-  const { anchorRef, popoverFast: fast = true } = props;
+  const { anchorRef, ref: providedRef, popoverFast: fast = true } = props;
 
   if (!anchorRef) {
     throw new Error('usePopover requires an anchorRef');
   }
 
-  const popoverRef = useRef<HTMLElement>(null);
+  const popoverRef = useRefOrProvided(providedRef);
+  if (typeof popoverRef === 'function') {
+    throw new Error('usePopover requires an object-style ref');
+  }
   const popperInstanceRef = useRef<Popper | null>(null);
   /**
    * NOTE: if props.fast === true, we never set this data, we bypass
@@ -101,7 +112,7 @@ export const usePopover = createBehavior((props: PopoverConfig) => {
   ]);
 
   useLayoutEffect(() => {
-    if (!anchorRef.current || !popoverRef.current) {
+    if (!anchorRef.current || !popoverRef || !popoverRef.current) {
       return;
     }
 
@@ -148,7 +159,7 @@ export const usePopover = createBehavior((props: PopoverConfig) => {
     };
   }, [
     anchorRef.current,
-    popoverRef.current,
+    popoverRef && popoverRef.current,
     setPopperData,
     popperConfig,
     fast,

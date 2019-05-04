@@ -1,7 +1,5 @@
 import { BehaviorProps, BrandTheme, Size } from '../types';
 import { createBehavior, isSize } from '../util';
-import { useContext } from 'react';
-import { ThemeContext } from '../contexts';
 
 const MAX_Z_INDEX = 2147483647;
 

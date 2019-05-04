@@ -43,7 +43,7 @@ export type InputType =
   | 'reset';
 
 export type InputConfig = ValueConfig &
-  FocusConfig &
+  FocusConfig<HTMLInputElement> &
   TextConfig &
   SpacingConfig & {
     type?: InputType;
