@@ -19,6 +19,8 @@ import {
   useRefOrProvided,
 } from '../util';
 
+export type SelectionMethod = 'pointer' | 'keyboard';
+
 export type SelectionContextParentView = {
   selectIndex(index: number): void;
   focus(): void;
@@ -156,7 +158,10 @@ export type SelectionGroupProviderProps<T extends HTMLElement> = {
   groupId?: string;
   axis?: 'horizontal' | 'vertical';
   wrap?: boolean;
-  onSelectionChanged?(selection: { id: string | null; index: number }): void;
+  onSelectionChanged?(
+    selection: { id: string | null; index: number },
+    method: SelectionMethod,
+  ): void;
   selectedIndex: number;
   children: (renderProps: SelectionGroupRenderProps<T>) => ReactNode;
   ref?: Ref<T>;
@@ -230,10 +235,13 @@ export const SelectionGroupProvider = forwardRef<
         const selectElement = elements[nextIdx];
         if (selectElement) {
           onSelectionChanged &&
-            onSelectionChanged({
-              id: selectElement,
-              index: nextIdx,
-            });
+            onSelectionChanged(
+              {
+                id: selectElement,
+                index: nextIdx,
+              },
+              'keyboard',
+            );
         }
         event.preventDefault();
       } else if (event.keyCode === previousKeyCode) {
@@ -241,10 +249,13 @@ export const SelectionGroupProvider = forwardRef<
         const selectElement = elements[previousIdx];
         if (selectElement) {
           onSelectionChanged &&
-            onSelectionChanged({
-              id: selectElement,
-              index: previousIdx,
-            });
+            onSelectionChanged(
+              {
+                id: selectElement,
+                index: previousIdx,
+              },
+              'keyboard',
+            );
         }
         event.preventDefault();
       } else if (parent && event.keyCode === nextSiblingKeyCode) {
@@ -281,20 +292,26 @@ export const SelectionGroupProvider = forwardRef<
       );
       if (matchingElementIndex >= 0) {
         onSelectionChanged &&
-          onSelectionChanged({
-            index: matchingElementIndex,
-            id: element.id,
-          });
+          onSelectionChanged(
+            {
+              index: matchingElementIndex,
+              id: element.id,
+            },
+            'pointer',
+          );
       }
     };
 
     const selectIndex = (index: number) => {
       if (index === -1) {
         onSelectionChanged &&
-          onSelectionChanged({
-            index,
-            id: null,
-          });
+          onSelectionChanged(
+            {
+              index,
+              id: null,
+            },
+            'keyboard',
+          );
       }
 
       let selectedElement;
@@ -307,10 +324,13 @@ export const SelectionGroupProvider = forwardRef<
 
       if (selectedElement) {
         onSelectionChanged &&
-          onSelectionChanged({
-            index,
-            id: selectedElement,
-          });
+          onSelectionChanged(
+            {
+              index,
+              id: selectedElement,
+            },
+            'keyboard',
+          );
       }
     };
 

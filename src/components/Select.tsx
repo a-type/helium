@@ -14,6 +14,7 @@ import { Portal } from 'react-portal';
 import OptionsList from './OptionsList';
 import { useImperativeFocus } from '../contexts';
 import { KeyCode } from '../types';
+import { SelectionMethod } from '../contexts/selection';
 
 export type SelectProps<T> = {
   options: T[];
@@ -41,9 +42,11 @@ export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
       imperativelyFocus(id);
     };
 
-    const handleSelection = (value: any) => {
+    const handleSelection = (value: any, method: SelectionMethod) => {
       onChange(value);
-      //handleClose();
+      if (method === 'pointer') {
+        handleClose();
+      }
     };
 
     const extraInputProps = useAll<PopoverAnchorConfig & PressableConfig>(

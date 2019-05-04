@@ -9,7 +9,7 @@ import {
   useFocus,
 } from '../primitives';
 import { useAll, toString, useRefOrProvided } from '../util';
-import { SelectionGroupProvider } from '../contexts/selection';
+import { SelectionGroupProvider, SelectionMethod } from '../contexts/selection';
 import { Box, BoxProps } from './Box';
 
 export interface OptionsListItemProps extends HTMLAttributes<HTMLDivElement> {
@@ -22,7 +22,7 @@ export type OptionsListProps<T> = HTMLAttributes<HTMLDivElement> &
     renderOption?: (option: T) => ReactNode;
     getOptionKey?: (option: T) => string;
     id?: string;
-    onOptionSelected: (option: T) => void;
+    onOptionSelected: (option: T, method: SelectionMethod) => void;
     selectedIndex: number;
   };
 
@@ -61,8 +61,11 @@ export const OptionsList = <T extends any = any>({
   const ref = useRefOrProvided<HTMLDivElement>(providedRef);
   const focusableProps = useFocus({ id, ref });
   const optionKeys = options.map(getOptionKey);
-  const handleSelectionChanged = ({ index }: { index: number }) => {
-    onOptionSelected(options[index]);
+  const handleSelectionChanged = (
+    { index }: { index: number },
+    method: SelectionMethod,
+  ) => {
+    onOptionSelected(options[index], method);
   };
 
   return (
