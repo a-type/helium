@@ -6,7 +6,10 @@ import React, {
   useEffect,
   useState,
   Ref,
-  RefObject,
+  ReactNode,
+  KeyboardEvent,
+  MouseEvent,
+  forwardRef,
 } from 'react';
 import { KeyCode } from '../types';
 import {
@@ -31,14 +34,17 @@ export type SelectionRootContextValue = {
   goToPreviousGroup(groupId: string, currentIndex: number): boolean;
 };
 
-export type SelectionGroupContextValue = {
-  onKeyDown(ev: KeyboardEvent): void;
-  onKeyUp(ev: KeyboardEvent): void;
-  onMouseDown(ev: MouseEvent): void;
-  id: string;
+export type SelectionGroupRenderProps<T extends HTMLElement> = {
   selectedId: string | null;
   selectedIndex: number;
-  registerGroupElement(elementRef: Ref<HTMLElement>): void;
+  props: {
+    ref: Ref<T>;
+    onKeyDown(ev: KeyboardEvent<any>): void;
+    onKeyUp(ev: KeyboardEvent<any>): void;
+    onMouseDown(ev: MouseEvent<any>): void;
+    id: string;
+    'aria-activedescendant': string | undefined;
+  };
 };
 
 export type SelectionElementContextValue = {
@@ -51,15 +57,6 @@ export type SelectionElementContextValue = {
 export const SelectionRootContext = createContext<SelectionRootContextValue | null>(
   null,
 );
-export const SelectionGroupContext = createContext<SelectionGroupContextValue>({
-  onKeyDown: () => {},
-  onKeyUp: () => {},
-  onMouseDown: () => {},
-  registerGroupElement: () => {},
-  id: 'none',
-  selectedId: null,
-  selectedIndex: -1,
-});
 export const SelectionElementContext = createContext<
   SelectionElementContextValue
 >({
@@ -155,12 +152,14 @@ export const SelectionRootProvider: FC<SelectionRootProviderProps> = ({
   );
 };
 
-export type SelectionGroupProviderProps = {
+export type SelectionGroupProviderProps<T extends HTMLElement> = {
   groupId?: string;
   axis?: 'horizontal' | 'vertical';
   wrap?: boolean;
   onSelectionChanged?(selection: { id: string | null; index: number }): void;
   selectedIndex: number;
+  children: (renderProps: SelectionGroupRenderProps<T>) => ReactNode;
+  ref?: Ref<T>;
 };
 
 /**
@@ -171,184 +170,191 @@ export type SelectionGroupProviderProps = {
  * transition focus to the next sibling Keyboard Group. If no Root is present,
  * orthogonal keyboard navigation will not do anything.
  */
-export const SelectionGroupProvider: FC<SelectionGroupProviderProps> = ({
-  groupId: providedGroupId,
-  axis = 'horizontal',
-  wrap = true,
-  onSelectionChanged,
-  selectedIndex,
-  children,
-}) => {
-  const nextKeyCode =
-    axis === 'horizontal' ? KeyCode.ArrowRight : KeyCode.ArrowDown;
-  const previousKeyCode =
-    axis === 'horizontal' ? KeyCode.ArrowLeft : KeyCode.ArrowUp;
-  const nextSiblingKeyCode =
-    axis === 'horizontal' ? KeyCode.ArrowDown : KeyCode.ArrowRight;
-  const previousSiblingKeyCode =
-    axis === 'horizontal' ? KeyCode.ArrowUp : KeyCode.ArrowLeft;
+export const SelectionGroupProvider = forwardRef<
+  any,
+  SelectionGroupProviderProps<any>
+>(
+  (
+    {
+      groupId: providedGroupId,
+      axis = 'horizontal',
+      wrap = true,
+      onSelectionChanged,
+      selectedIndex,
+      children,
+    },
+    providedRef,
+  ) => {
+    const nextKeyCode =
+      axis === 'horizontal' ? KeyCode.ArrowRight : KeyCode.ArrowDown;
+    const previousKeyCode =
+      axis === 'horizontal' ? KeyCode.ArrowLeft : KeyCode.ArrowUp;
+    const nextSiblingKeyCode =
+      axis === 'horizontal' ? KeyCode.ArrowDown : KeyCode.ArrowRight;
+    const previousSiblingKeyCode =
+      axis === 'horizontal' ? KeyCode.ArrowUp : KeyCode.ArrowLeft;
 
-  const groupId = useIdOrGenerated(providedGroupId, 'keyboardGroup');
-  const [groupElementRef, setGroupElementRef] = useState<RefObject<
-    HTMLElement
-  > | null>(null);
+    const groupId = useIdOrGenerated(providedGroupId, 'keyboardGroup');
+    const groupElementRef = useRefOrProvided(providedRef);
 
-  const registerGroupElement = (elementRef: Ref<HTMLElement>) => {
-    if (typeof elementRef === 'function' || typeof elementRef === 'string') {
+    if (
+      typeof groupElementRef === 'function' ||
+      typeof groupElementRef === 'string'
+    ) {
       // FIXME?
       throw new Error('Only object refs are supported on selection groups');
     }
 
-    setGroupElementRef(elementRef);
-  };
+    const parent = useContext(SelectionRootContext);
+    const [elements, setElements] = useState<string[]>([]);
 
-  const parent = useContext(SelectionRootContext);
-  const [elements, setElements] = useState<string[]>([]);
+    const selectedId = elements[selectedIndex];
 
-  const selectedId = elements[selectedIndex];
-
-  const registerElement = (elementId: string) => {
-    setElements(oldElements => [...oldElements, elementId]);
-  };
-
-  const unregisterElement = (elementId: string) => {
-    const idx = elements.findIndex(id => id === elementId);
-    setElements(oldElements => [
-      ...oldElements.slice(0, idx),
-      ...oldElements.slice(idx + 1),
-    ]);
-  };
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    const idx = selectedIndex;
-
-    if (event.keyCode === nextKeyCode) {
-      const nextIdx = getNextIndex(idx, elements.length, wrap);
-      const selectElement = elements[nextIdx];
-      if (selectElement) {
-        onSelectionChanged &&
-          onSelectionChanged({
-            id: selectElement,
-            index: nextIdx,
-          });
-      }
-      event.preventDefault();
-    } else if (event.keyCode === previousKeyCode) {
-      const previousIdx = getPreviousIndex(idx, elements.length, wrap);
-      const selectElement = elements[previousIdx];
-      if (selectElement) {
-        onSelectionChanged &&
-          onSelectionChanged({
-            id: selectElement,
-            index: previousIdx,
-          });
-      }
-      event.preventDefault();
-    } else if (parent && event.keyCode === nextSiblingKeyCode) {
-      parent.goToNextGroup(groupId, idx);
-      event.preventDefault();
-    } else if (parent && event.keyCode === previousSiblingKeyCode) {
-      parent.goToPreviousGroup(groupId, idx);
-      event.preventDefault();
-    }
-  };
-
-  const onKeyUp = (event: KeyboardEvent) => {
-    if (
-      // isFocusedElement &&
-      [nextKeyCode, previousKeyCode].includes(event.keyCode)
-    ) {
-      event.preventDefault();
-    } else if (
-      [
-        KeyCode.Enter,
-        KeyCode.Escape,
-        nextSiblingKeyCode,
-        previousSiblingKeyCode,
-      ].includes(event.keyCode)
-    ) {
-      event.preventDefault();
-    }
-  };
-
-  const onMouseDown = (event: MouseEvent) => {
-    const element = event.target as HTMLElement;
-    const matchingElementIndex = elements.findIndex(
-      elementId => elementId === element.id,
-    );
-    if (matchingElementIndex >= 0) {
-      onSelectionChanged &&
-        onSelectionChanged({
-          index: matchingElementIndex,
-          id: element.id,
-        });
-    }
-  };
-
-  const selectIndex = (index: number) => {
-    if (index === -1) {
-      onSelectionChanged &&
-        onSelectionChanged({
-          index,
-          id: null,
-        });
-    }
-
-    let selectedElement;
-    // falls back to last element if there aren't enough elements to fulfill index
-    if (!elements[index] && elements.length) {
-      selectedElement = elements[elements.length - 1];
-    } else {
-      selectedElement = elements[index];
-    }
-
-    if (selectedElement) {
-      onSelectionChanged &&
-        onSelectionChanged({
-          index,
-          id: selectedElement,
-        });
-    }
-  };
-
-  const focus = () => {
-    if (groupElementRef && groupElementRef.current) {
-      groupElementRef.current.focus();
-    }
-  };
-
-  useEffect(() => {
-    if (parent) {
-      parent.registerSelectionGroup(groupId, { selectIndex, focus });
-    }
-
-    return () => {
-      if (parent) parent.unregisterSelectionGroup(groupId);
+    const registerElement = (elementId: string) => {
+      setElements(oldElements => [...oldElements, elementId]);
     };
-  }, [parent, groupId, selectIndex]);
 
-  const groupValue = {
-    onKeyUp,
-    onKeyDown,
-    id: groupId,
-    selectedId,
-    selectedIndex,
-    onMouseDown,
-    registerGroupElement,
-  };
+    const unregisterElement = (elementId: string) => {
+      const idx = elements.findIndex(id => id === elementId);
+      setElements(oldElements => [
+        ...oldElements.slice(0, idx),
+        ...oldElements.slice(idx + 1),
+      ]);
+    };
 
-  const elementValue = {
-    id: groupId,
-    selectedId,
-    registerElement,
-    unregisterElement,
-  };
+    const onKeyDown = (event: KeyboardEvent<any>) => {
+      const idx = selectedIndex;
 
-  return (
-    <SelectionGroupContext.Provider value={groupValue}>
+      if (event.keyCode === nextKeyCode) {
+        const nextIdx = getNextIndex(idx, elements.length, wrap);
+        const selectElement = elements[nextIdx];
+        if (selectElement) {
+          onSelectionChanged &&
+            onSelectionChanged({
+              id: selectElement,
+              index: nextIdx,
+            });
+        }
+        event.preventDefault();
+      } else if (event.keyCode === previousKeyCode) {
+        const previousIdx = getPreviousIndex(idx, elements.length, wrap);
+        const selectElement = elements[previousIdx];
+        if (selectElement) {
+          onSelectionChanged &&
+            onSelectionChanged({
+              id: selectElement,
+              index: previousIdx,
+            });
+        }
+        event.preventDefault();
+      } else if (parent && event.keyCode === nextSiblingKeyCode) {
+        parent.goToNextGroup(groupId, idx);
+        event.preventDefault();
+      } else if (parent && event.keyCode === previousSiblingKeyCode) {
+        parent.goToPreviousGroup(groupId, idx);
+        event.preventDefault();
+      }
+    };
+
+    const onKeyUp = (event: KeyboardEvent<any>) => {
+      if (
+        // isFocusedElement &&
+        [nextKeyCode, previousKeyCode].includes(event.keyCode)
+      ) {
+        event.preventDefault();
+      } else if (
+        [
+          KeyCode.Enter,
+          KeyCode.Escape,
+          nextSiblingKeyCode,
+          previousSiblingKeyCode,
+        ].includes(event.keyCode)
+      ) {
+        event.preventDefault();
+      }
+    };
+
+    const onMouseDown = (event: MouseEvent<any>) => {
+      const element = event.target as HTMLElement;
+      const matchingElementIndex = elements.findIndex(
+        elementId => elementId === element.id,
+      );
+      if (matchingElementIndex >= 0) {
+        onSelectionChanged &&
+          onSelectionChanged({
+            index: matchingElementIndex,
+            id: element.id,
+          });
+      }
+    };
+
+    const selectIndex = (index: number) => {
+      if (index === -1) {
+        onSelectionChanged &&
+          onSelectionChanged({
+            index,
+            id: null,
+          });
+      }
+
+      let selectedElement;
+      // falls back to last element if there aren't enough elements to fulfill index
+      if (!elements[index] && elements.length) {
+        selectedElement = elements[elements.length - 1];
+      } else {
+        selectedElement = elements[index];
+      }
+
+      if (selectedElement) {
+        onSelectionChanged &&
+          onSelectionChanged({
+            index,
+            id: selectedElement,
+          });
+      }
+    };
+
+    const focus = () => {
+      if (groupElementRef && groupElementRef.current) {
+        groupElementRef.current.focus();
+      }
+    };
+
+    useEffect(() => {
+      if (parent) {
+        parent.registerSelectionGroup(groupId, { selectIndex, focus });
+      }
+
+      return () => {
+        if (parent) parent.unregisterSelectionGroup(groupId);
+      };
+    }, [parent, groupId, selectIndex]);
+
+    const groupValue = {
+      selectedId,
+      selectedIndex,
+      props: {
+        onMouseDown,
+        onKeyUp,
+        onKeyDown,
+        id: groupId,
+        ref: groupElementRef,
+        'aria-activedescendant': selectedId || undefined,
+        tabIndex: 0,
+      },
+    };
+
+    const elementValue = {
+      id: groupId,
+      selectedId,
+      registerElement,
+      unregisterElement,
+    };
+
+    return (
       <SelectionElementContext.Provider value={elementValue}>
-        {children}
+        {children(groupValue)}
       </SelectionElementContext.Provider>
-    </SelectionGroupContext.Provider>
-  );
-};
+    );
+  },
+);

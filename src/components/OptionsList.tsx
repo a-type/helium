@@ -5,11 +5,10 @@ import {
   useSelectableItem,
   useSpacing,
   useText,
-  useFocus,
   useSizing,
-  useSelectableGroup,
+  useFocus,
 } from '../primitives';
-import { useAll, toString } from '../util';
+import { useAll, toString, useRefOrProvided } from '../util';
 import { SelectionGroupProvider } from '../contexts/selection';
 import { Box, BoxProps } from './Box';
 
@@ -49,49 +48,49 @@ export const OptionsListItem: FC<OptionsListItemProps> = ({
 export const defaultOptionsListRenderOption = toString;
 export const defaultOptionsListGetOptionKey = toString;
 
-export const OptionsListInner = <T extends any = any>({
+export const OptionsList = <T extends any = any>({
   options,
+  selectedIndex,
+  onOptionSelected,
   renderOption = defaultOptionsListRenderOption,
   getOptionKey = defaultOptionsListGetOptionKey,
   id,
-  ref,
+  ref: providedRef,
   ...rest
 }: OptionsListProps<T>) => {
-  const behaviorProps = useAll({ id, ref, ...rest }, [
-    useFocus,
-    useSelectableGroup,
-  ]);
+  const ref = useRefOrProvided<HTMLDivElement>(providedRef);
+  const focusableProps = useFocus({ id, ref });
   const optionKeys = options.map(getOptionKey);
-
-  return (
-    <Box direction="column" role="listbox" {...rest} {...behaviorProps}>
-      {options.map((option, index) => (
-        <OptionsListItem
-          key={optionKeys[index]}
-          id={id + '_' + optionKeys[index]}
-        >
-          {renderOption(option)}
-        </OptionsListItem>
-      ))}
-    </Box>
-  );
-};
-
-export const OptionsList = <T extends any = any>(
-  props: OptionsListProps<T>,
-) => {
   const handleSelectionChanged = ({ index }: { index: number }) => {
-    props.onOptionSelected(props.options[index]);
+    onOptionSelected(options[index]);
   };
 
   return (
     <SelectionGroupProvider
       axis="vertical"
-      selectedIndex={props.selectedIndex}
+      selectedIndex={selectedIndex}
       onSelectionChanged={handleSelectionChanged}
-      groupId={props.id}
+      groupId={id}
+      ref={ref}
     >
-      <OptionsListInner {...props} />
+      {({ props }) => (
+        <Box
+          direction="column"
+          role="listbox"
+          {...rest}
+          {...focusableProps}
+          {...props}
+        >
+          {options.map((option, index) => (
+            <OptionsListItem
+              key={optionKeys[index]}
+              id={id + '_' + optionKeys[index]}
+            >
+              {renderOption(option)}
+            </OptionsListItem>
+          ))}
+        </Box>
+      )}
     </SelectionGroupProvider>
   );
 };

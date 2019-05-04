@@ -5,8 +5,7 @@ import {
   SelectionRootProvider,
   SelectionGroupProvider,
 } from '../contexts/selection';
-import { Button } from '../components';
-import { useSelectableItem, useSelectableGroup } from './interaction';
+import { useSelectableItem } from './interaction';
 import { withKnobs, boolean } from '@storybook/addon-knobs';
 import { useState } from 'react';
 import { useAll } from '../util';
@@ -28,28 +27,6 @@ const SelectableItem = ({ idx }: { idx: number }) => {
   );
 };
 
-const SelectableGroup = ({ vertical = false }: { vertical: boolean }) => {
-  const selectableGroupProps = useSelectableGroup({});
-
-  return (
-    <ul
-      {...selectableGroupProps}
-      css={{
-        display: 'flex',
-        flexDirection: vertical ? 'column' : 'row',
-        listStyle: 'none',
-        margin: 0,
-        padding: 0,
-      }}
-    >
-      <SelectableItem idx={0} />
-      <SelectableItem idx={1} />
-      <SelectableItem idx={2} />
-      <SelectableItem idx={3} />
-    </ul>
-  );
-};
-
 const SelectableDemo = ({ vertical = false }: { vertical: boolean }) => {
   const [selected, setSelected] = useState(-1);
 
@@ -59,7 +36,23 @@ const SelectableDemo = ({ vertical = false }: { vertical: boolean }) => {
       selectedIndex={selected}
       onSelectionChanged={({ index }) => setSelected(index)}
     >
-      <SelectableGroup vertical={vertical} />
+      {({ props }) => (
+        <ul
+          {...props}
+          css={{
+            display: 'flex',
+            flexDirection: vertical ? 'column' : 'row',
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          <SelectableItem idx={0} />
+          <SelectableItem idx={1} />
+          <SelectableItem idx={2} />
+          <SelectableItem idx={3} />
+        </ul>
+      )}
     </SelectionGroupProvider>
   );
 };

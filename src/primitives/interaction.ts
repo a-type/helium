@@ -3,10 +3,7 @@ import { createBehavior, useRefOrProvided, useIdOrGenerated } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';
 import { KeyCode, BehaviorProps, BrandTheme } from '../types';
-import {
-  SelectionElementContext,
-  SelectionGroupContext,
-} from '../contexts/selection';
+import { SelectionElementContext } from '../contexts/selection';
 
 export const defaultFocusCss = (theme: BrandTheme) => ({
   '&:focus': {
@@ -108,34 +105,6 @@ export const usePressable = ({
     css: pressableCss,
   };
 };
-
-export type SelectableGroupConfig = {
-  id?: string;
-  ref?: Ref<HTMLElement>;
-} & BehaviorProps;
-
-export const useSelectableGroup = createBehavior<SelectableGroupConfig>(
-  ({ id: providedId, ref: providedRef }) => {
-    const id = useIdOrGenerated(providedId, 'selectableGroup');
-    const ref = useRefOrProvided(providedRef);
-    const keyboardContext = useContext(SelectionGroupContext);
-
-    useEffect(() => {
-      keyboardContext.registerGroupElement(ref);
-      return () => keyboardContext.registerGroupElement(null);
-    }, [ref]);
-
-    return {
-      id,
-      'aria-activedescendant': keyboardContext.selectedId,
-      onMouseDown: keyboardContext.onMouseDown,
-      onKeyDown: keyboardContext.onKeyDown,
-      onKeyUp: keyboardContext.onKeyUp,
-      tabIndex: 0,
-      ref,
-    };
-  },
-);
 
 export type SelectableItemConfig = {
   id?: string;

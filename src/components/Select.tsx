@@ -23,7 +23,7 @@ export type SelectProps<T> = {
 };
 
 export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
-  ({ id: providedId, ...props }, ref) => {
+  ({ id: providedId, onChange, ...props }, ref) => {
     const id = useIdOrGenerated(providedId, 'select');
     const optionsId = id + '_options';
     const [open, setOpen] = useState(false);
@@ -39,6 +39,11 @@ export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
     const handleClose = () => {
       setOpen(false);
       imperativelyFocus(id);
+    };
+
+    const handleSelection = (value: any) => {
+      onChange(value);
+      //handleClose();
     };
 
     const extraInputProps = useAll<PopoverAnchorConfig & PressableConfig>(
@@ -70,7 +75,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps<any>>(
             >
               <OptionsList
                 id={optionsId}
-                onOptionSelected={props.onChange}
+                onOptionSelected={handleSelection}
                 options={options}
                 width="100%"
                 selectedIndex={options.indexOf(props.value)}
