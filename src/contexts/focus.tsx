@@ -6,7 +6,11 @@ import React, {
   Ref,
   useContext,
   useRef,
+  useEffect,
+  ReactNode,
+  forwardRef,
 } from 'react';
+import { useRefOrProvided } from '../util';
 
 export type FocusContextValue = {
   groupName: string | null;
@@ -22,69 +26,140 @@ export const FocusContext = createContext<FocusContextValue>({
   focus: () => {},
 });
 
+export type FocusProviderRenderProps = {
+  ref: Ref<HTMLElement>;
+};
+
 export type FocusProviderProps = {
   groupName?: string;
+  ref?: Ref<HTMLElement>;
+  children(renderProps: FocusProviderRenderProps): ReactNode;
+  trapFocus?: boolean;
 };
 
-export const FocusProvider: FC<FocusProviderProps> = ({
-  groupName,
-  ...rest
-}) => {
-  const elementsRef = useRef<{
-    [name: string]: RefObject<HTMLElement> | null;
-  }>({});
+export const FocusProvider = forwardRef<any, FocusProviderProps>(
+  ({ groupName, trapFocus, children, ...rest }, providedRef) => {
+    const elementsRef = useRef<
+      { id: string; ref: RefObject<HTMLElement> | null }[]
+    >([]);
 
-  const register = useCallback(
-    (elementId: string, elementRef: Ref<HTMLElement>) => {
-      if (typeof elementRef === 'function' || typeof elementRef === 'string') {
-        throw new Error('Only object refs are supported');
+    const ref = useRefOrProvided<HTMLElement>(providedRef);
+    const lastFocusedRef = useRef<HTMLElement | null>(null);
+
+    if (typeof ref === 'function') {
+      // FIXME
+      throw new Error('FocusProvider requires an object-style ref');
+    }
+
+    useEffect(() => {
+      if (!ref || !trapFocus) {
+        return;
       }
 
-      elementsRef.current = {
-        ...elementsRef.current,
-        [elementId]: elementRef,
+      const container =
+        ref.current || (typeof children !== 'function' ? document : null);
+
+      if (!container) {
+        return;
+      }
+
+      const trapFocusInside = (ev: FocusEvent) => {
+        const target = ev.target as HTMLElement;
+        if (container.contains(target)) {
+          lastFocusedRef.current = target;
+          return;
+        }
+
+        const firstFocusable = elementsRef.current[0];
+        const firstFocusableElement =
+          firstFocusable && firstFocusable.ref && firstFocusable.ref.current;
+        if (lastFocusedRef.current === firstFocusableElement) {
+          const lastFocusable =
+            elementsRef.current[elementsRef.current.length - 1];
+          const lastFocusableElement =
+            lastFocusable && lastFocusable.ref && lastFocusable.ref.current;
+          if (lastFocusableElement) {
+            lastFocusableElement.focus();
+            lastFocusedRef.current = lastFocusableElement;
+            ev.preventDefault();
+          }
+        } else if (firstFocusableElement) {
+          firstFocusableElement.focus();
+          lastFocusedRef.current = firstFocusableElement;
+          ev.preventDefault();
+        } else {
+          return;
+        }
       };
-    },
-    [elementsRef],
-  );
 
-  const unregister = useCallback(
-    (elementId: string) => {
-      delete elementsRef.current[elementId];
-    },
-    [elementsRef],
-  );
+      document.addEventListener('focus', trapFocusInside);
+      return document.removeEventListener('focus', trapFocusInside);
+    }, [ref && ref.current, trapFocus]);
 
-  const focus = useCallback(
-    (elementId: string) => {
-      const elementRef = elementsRef.current[elementId];
-      console.log(elementRef);
-      if (elementRef && elementRef.current) {
-        console.debug('imperatively focusing ', elementRef.current);
-        elementRef.current.focus();
-      } else {
-        console.debug(
-          `Tried to focus element ${elementId}, but it was not found in focus group${
-            groupName ? ` "${groupName}"` : ''
-          }`,
+    const register = useCallback(
+      (elementId: string, elementRef: Ref<HTMLElement>) => {
+        if (
+          typeof elementRef === 'function' ||
+          typeof elementRef === 'string'
+        ) {
+          throw new Error('Only object refs are supported');
+        }
+
+        elementsRef.current = [
+          ...elementsRef.current,
+          { id: elementId, ref: elementRef },
+        ];
+      },
+      [elementsRef.current],
+    );
+
+    const unregister = useCallback(
+      (elementId: string) => {
+        elementsRef.current = elementsRef.current.filter(
+          ({ id }) => id !== elementId,
         );
-      }
-    },
-    [elementsRef],
-  );
+      },
+      [elementsRef.current],
+    );
 
-  return (
-    <FocusContext.Provider
-      {...rest}
-      value={{
-        register,
-        unregister,
-        focus,
-        groupName: groupName || null,
-      }}
-    />
-  );
-};
+    const focus = useCallback(
+      (elementId: string) => {
+        const elementRef = elementsRef.current.find(
+          ({ id }) => id === elementId,
+        );
+        if (elementRef && elementRef.ref && elementRef.ref.current) {
+          console.debug('imperatively focusing ', elementRef.ref.current);
+          elementRef.ref.current.focus();
+        } else {
+          console.debug(
+            `Tried to focus element ${elementId}, but it was not found in focus group${
+              groupName ? ` "${groupName}"` : ''
+            }`,
+          );
+        }
+      },
+      [elementsRef],
+    );
+
+    const renderProps = {
+      ref,
+    };
+
+    return (
+      <FocusContext.Provider
+        {...rest}
+        value={{
+          register,
+          unregister,
+          focus,
+          groupName: groupName || null,
+        }}
+      >
+        {children(renderProps)}
+      </FocusContext.Provider>
+    );
+  },
+);
 
 export const useImperativeFocus = () => {
   const focusContext = useContext(FocusContext);

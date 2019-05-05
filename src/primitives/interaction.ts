@@ -1,4 +1,4 @@
-import { useContext, useEffect, useCallback, Ref } from 'react';
+import { useContext, useEffect, useCallback, Ref, useRef } from 'react';
 import { createBehavior, useRefOrProvided, useIdOrGenerated } from '../util';
 import { InterpolationWithTheme } from '@emotion/core';
 import { FocusContext } from '../contexts/focus';

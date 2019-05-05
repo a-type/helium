@@ -9,8 +9,8 @@ import {
   useDepth,
   FlexLayoutConfig,
   useFlexLayout,
-  useContentArea,
-  ContentAreaConfig,
+  useContentColors,
+  ContentColorsConfig,
   useEscapable,
   EscapableConfig,
 } from '../primitives';
@@ -18,7 +18,7 @@ import { useAll, useRefOrProvided } from '../util';
 import { forwardRef, useEffect } from 'react';
 
 export type DockPanelProps = SpacingConfig &
-  ContentAreaConfig &
+  ContentColorsConfig &
   FlexLayoutConfig &
   PopoverConfig &
   DepthConfig &
@@ -54,7 +54,7 @@ export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>(
       [
         usePopover,
         useSpacing,
-        useContentArea,
+        useContentColors,
         useDepth,
         useFlexLayout,
         useEscapable,

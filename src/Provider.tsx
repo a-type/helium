@@ -104,6 +104,6 @@ export const Provider: FC<ProviderProps> = ({
   children,
 }) => (
   <Contexts.ThemeProvider theme={theme}>
-    <Contexts.FocusProvider>{children}</Contexts.FocusProvider>
+    <Contexts.FocusProvider>{() => children}</Contexts.FocusProvider>
   </Contexts.ThemeProvider>
 );

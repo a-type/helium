@@ -11,14 +11,14 @@ import { useState } from 'react';
 import { useAll } from '../util';
 import { useText } from './text';
 import { useSpacing } from './positioning';
-import { useContentArea } from './styling';
+import { useContentColors } from './styling';
 
 const SelectableItem = ({ idx }: { idx: number }) => {
   const selectableProps = useAll(
     {
       padding: 'md',
     },
-    [useSelectableItem, useText, useSpacing, useContentArea],
+    [useSelectableItem, useText, useSpacing, useContentColors],
   );
   return (
     <li {...selectableProps} margin="4px">

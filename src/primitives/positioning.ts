@@ -1,9 +1,9 @@
-import { BehaviorProps, BrandTheme, Size } from "../types";
-import { createBehavior, isSize } from "../util";
+import { BehaviorProps, BrandTheme, Size } from '../types';
+import { createBehavior, isSize } from '../util';
 
 const MAX_Z_INDEX = 2147483647;
 
-export type NamedDepth = "neutral" | "transcendent";
+export type NamedDepth = 'neutral' | 'transcendent';
 export type Depth = number | NamedDepth;
 
 export type DepthConfig = {
@@ -13,9 +13,9 @@ export type DepthConfig = {
 
 export const useDepth = createBehavior((config: DepthConfig) => {
   const zIndex =
-    config.depth === "neutral"
+    config.depth === 'neutral'
       ? 0
-      : config.depth === "transcendent"
+      : config.depth === 'transcendent'
       ? MAX_Z_INDEX
       : config.depth || 0;
   return {
@@ -24,8 +24,8 @@ export const useDepth = createBehavior((config: DepthConfig) => {
       boxShadow:
         (config.shadow === undefined || config.shadow) && zIndex > 0
           ? theme.shadow.level[Math.min(zIndex, 4)]
-          : "none"
-    })
+          : 'none',
+    }),
   };
 });
 
@@ -55,8 +55,8 @@ const parseSize = (size: Size | string | undefined, theme: BrandTheme) => {
 
 const parseSpacing = (
   spacing: Spacing | undefined,
-  styleType: "margin" | "padding",
-  theme: BrandTheme
+  styleType: 'margin' | 'padding',
+  theme: BrandTheme,
 ): {
   [cssKey: string]: string | undefined;
 } => {
@@ -64,11 +64,11 @@ const parseSpacing = (
     return {};
   }
 
-  if (typeof spacing === "string") {
+  if (typeof spacing === 'string') {
     return parseSpacing(
       { vertical: spacing, horizontal: spacing },
       styleType,
-      theme
+      theme,
     );
   }
 
@@ -77,9 +77,12 @@ const parseSpacing = (
     [`${styleType}Top`]: parseSize(spacing.top || spacing.vertical, theme),
     [`${styleType}Right`]: parseSize(
       spacing.right || spacing.horizontal,
-      theme
+      theme,
     ),
-    [`${styleType}Bottom`]: parseSize(spacing.bottom || spacing.vertical, theme)
+    [`${styleType}Bottom`]: parseSize(
+      spacing.bottom || spacing.vertical,
+      theme,
+    ),
   };
 };
 
@@ -87,35 +90,35 @@ export const useSpacing = createBehavior(
   ({ margin, padding }: SpacingConfig = {}): BehaviorProps => {
     return {
       css: theme => ({
-        ...parseSpacing(margin, "margin", theme),
-        ...parseSpacing(padding, "padding", theme)
-      })
+        ...parseSpacing(margin, 'margin', theme),
+        ...parseSpacing(padding, 'padding', theme),
+      }),
     };
-  }
+  },
 );
 
 export type SizingConfig = {
   width?: string;
   height?: string;
-  boxSizing?: "border-box" | "content-box";
+  boxSizing?: 'border-box' | 'content-box';
 } & BehaviorProps;
 
 export const useSizing = createBehavior(
   ({
-    width = "auto",
-    height = "auto",
-    boxSizing = "border-box"
+    width = 'auto',
+    height = 'auto',
+    boxSizing = 'border-box',
   }: SizingConfig): BehaviorProps => ({
     css: {
       width,
       height,
-      boxSizing
-    }
-  })
+      boxSizing,
+    },
+  }),
 );
 
 export type PositionConfig = {
-  position?: "absolute" | "relative" | "fixed" | "initial";
+  position?: 'absolute' | 'relative' | 'fixed' | 'initial';
   left?: Spacing & string;
   right?: Spacing & string;
   top?: Spacing & string;
@@ -123,13 +126,13 @@ export type PositionConfig = {
 };
 
 export const usePosition = createBehavior(
-  ({ position = "initial", left, right, top, bottom }: PositionConfig) => ({
+  ({ position = 'initial', left, right, top, bottom }: PositionConfig) => ({
     css: (theme: BrandTheme) => ({
       position,
       left: isSize(left) ? theme.size.spacing[left] : left,
       right: isSize(right) ? theme.size.spacing[right] : right,
       top: isSize(top) ? theme.size.spacing[top] : top,
-      bottom: isSize(bottom) ? theme.size.spacing[bottom] : bottom
-    })
-  })
+      bottom: isSize(bottom) ? theme.size.spacing[bottom] : bottom,
+    }),
+  }),
 );
