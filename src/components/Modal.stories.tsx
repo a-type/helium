@@ -5,5 +5,7 @@ import { Modal } from './Modal';
 import { action } from '@storybook/addon-actions';
 
 storiesOf('Modal', module).add('basic', () => (
-  <Modal onEscape={action('onEscape')}>Hello world</Modal>
+  <Modal onEscape={action('onEscape')} title="A modal!">
+    Hello world
+  </Modal>
 ));

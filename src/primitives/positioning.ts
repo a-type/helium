@@ -60,7 +60,7 @@ const parseSpacing = (
 ): {
   [cssKey: string]: string | undefined;
 } => {
-  if (!spacing) {
+  if (spacing === undefined) {
     return {};
   }
 
@@ -73,14 +73,20 @@ const parseSpacing = (
   }
 
   return {
-    [`${styleType}Left`]: parseSize(spacing.left || spacing.horizontal, theme),
-    [`${styleType}Top`]: parseSize(spacing.top || spacing.vertical, theme),
+    [`${styleType}Left`]: parseSize(
+      spacing.left !== undefined ? spacing.left : spacing.horizontal,
+      theme,
+    ),
+    [`${styleType}Top`]: parseSize(
+      spacing.top !== undefined ? spacing.top : spacing.vertical,
+      theme,
+    ),
     [`${styleType}Right`]: parseSize(
-      spacing.right || spacing.horizontal,
+      spacing.right !== undefined ? spacing.right : spacing.horizontal,
       theme,
     ),
     [`${styleType}Bottom`]: parseSize(
-      spacing.bottom || spacing.vertical,
+      spacing.bottom !== undefined ? spacing.bottom : spacing.vertical,
       theme,
     ),
   };
