@@ -1,101 +1,122 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
-import { FC, ReactNode, HTMLAttributes } from 'react';
+import { ReactNode, HTMLAttributes, forwardRef, Ref } from 'react';
 import {
   useSelectableItem,
   useSpacing,
   useText,
   useSizing,
   useFocus,
+  SpacingConfig,
+  SelectableItemConfig,
+  SizingConfig,
+  TextConfig,
+  FocusConfig,
 } from '../primitives';
-import { useAll, toString, useRefOrProvided } from '../util';
+import { useAll, toString, useRefOrProvided, useIdOrGenerated } from '../util';
 import { SelectionGroupProvider, SelectionMethod } from '../contexts/selection';
-import { Box, BoxProps } from './Box';
+import { List, ListProps, ListItem } from './List';
 
-export interface OptionsListItemProps extends HTMLAttributes<HTMLDivElement> {
-  id?: string;
-}
+export type OptionsListItemProps = SpacingConfig &
+  SelectableItemConfig &
+  TextConfig &
+  SizingConfig & {
+    id: string;
+    isSelected: boolean;
+  };
 
-export type OptionsListProps<T> = HTMLAttributes<HTMLDivElement> &
-  BoxProps & {
+export type OptionsListProps<T> = FocusConfig<HTMLUListElement> &
+  ListProps & {
     options: T[];
-    renderOption?: (option: T) => ReactNode;
+    optionToString?: (option: T) => string;
+    renderOption?: (props: OptionsListItemProps & { key: string }) => ReactNode;
     getOptionKey?: (option: T) => string;
     id?: string;
     onOptionSelected: (option: T, method: SelectionMethod) => void;
     selectedIndex: number;
   };
 
-export const OptionsListItem: FC<OptionsListItemProps> = ({
-  children,
-  id,
-  ...rest
-}) => {
-  const itemBehaviorProps = useAll(
-    {
-      id,
-      padding: { vertical: 'md', horizontal: 'lg' },
-      textSize: 'md',
-      width: '100%',
-      ...rest,
-    },
-    [useSelectableItem, useSpacing, useText, useSizing],
-  );
+export const OptionsListItem = forwardRef(
+  (
+    { children, id, ...rest }: OptionsListItemProps,
+    ref: Ref<HTMLLIElement>,
+  ) => {
+    const itemBehaviorProps = useAll(
+      {
+        id,
+        padding: { vertical: 'md', horizontal: 'lg' },
+        textSize: 'md',
+        width: '100%',
+        ...rest,
+        ref,
+      },
+      [useSelectableItem, useSpacing, useText, useSizing],
+    );
 
-  return <div {...itemBehaviorProps}>{children}</div>;
-};
+    return <ListItem {...itemBehaviorProps}>{children}</ListItem>;
+  },
+);
 
-export const defaultOptionsListRenderOption = toString;
+export const defaultOptionsListOptionToString = toString;
+export const defaultOptionsListRenderOption = (props: OptionsListItemProps) => (
+  <OptionsListItem {...props} />
+);
 export const defaultOptionsListGetOptionKey = toString;
 
-export const OptionsList = <T extends any = any>({
-  options,
-  selectedIndex,
-  onOptionSelected,
-  renderOption = defaultOptionsListRenderOption,
-  getOptionKey = defaultOptionsListGetOptionKey,
-  id,
-  ref: providedRef,
-  ...rest
-}: OptionsListProps<T>) => {
-  const ref = useRefOrProvided<HTMLDivElement>(providedRef);
-  const focusableProps = useFocus({ id, ref });
-  const optionKeys = options.map(getOptionKey);
-  const handleSelectionChanged = (
-    { index }: { index: number },
-    method: SelectionMethod,
+export const OptionsList = forwardRef(
+  <T extends any = any>(
+    {
+      options,
+      selectedIndex,
+      onOptionSelected,
+      optionToString = defaultOptionsListOptionToString,
+      renderOption = defaultOptionsListRenderOption,
+      getOptionKey = defaultOptionsListGetOptionKey,
+      id: providedId,
+      ...rest
+    }: OptionsListProps<T>,
+    providedRef?: Ref<HTMLUListElement>,
   ) => {
-    onOptionSelected(options[index], method);
-  };
+    const ref = useRefOrProvided<HTMLUListElement>(providedRef);
+    const id = useIdOrGenerated(providedId, 'optionsList');
+    const focusableProps = useFocus({ id, ref, ...rest });
+    const optionKeys = options.map(getOptionKey);
+    const handleSelectionChanged = (
+      { index }: { index: number },
+      method: SelectionMethod,
+    ) => {
+      onOptionSelected(options[index], method);
+    };
 
-  return (
-    <SelectionGroupProvider
-      axis="vertical"
-      selectedIndex={selectedIndex}
-      onSelectionChanged={handleSelectionChanged}
-      groupId={id}
-      ref={ref}
-    >
-      {({ props }) => (
-        <Box
-          direction="column"
-          role="listbox"
-          {...rest}
-          {...focusableProps}
-          {...props}
-        >
-          {options.map((option, index) => (
-            <OptionsListItem
-              key={optionKeys[index]}
-              id={id + '_' + optionKeys[index]}
-            >
-              {renderOption(option)}
-            </OptionsListItem>
-          ))}
-        </Box>
-      )}
-    </SelectionGroupProvider>
-  );
-};
+    return (
+      <SelectionGroupProvider
+        axis="vertical"
+        selectedIndex={selectedIndex}
+        onSelectionChanged={handleSelectionChanged}
+        groupId={id}
+        ref={ref}
+      >
+        {({ props }) => (
+          <List
+            displayType="plain"
+            role="listbox"
+            {...rest}
+            {...focusableProps}
+            {...props}
+          >
+            {options.map((option, index) => {
+              return renderOption({
+                key: optionKeys[index],
+                id: id + '_' + optionKeys[index],
+                children: optionToString(option),
+                isSelected: selectedIndex === index,
+              });
+            })}
+          </List>
+        )}
+      </SelectionGroupProvider>
+    );
+  },
+);
 
 export default OptionsList;
